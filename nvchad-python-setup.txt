@@ -1,0 +1,6 @@
+Настройка nvim + nvchad для разработки на python (включая дебагер)
+
+Инструкция youtube:
+  https://www.youtube.com/watch?v=t2QHJNvcyV4&t=4s&ab_channel=PojokCode
+Github nvchad с предустановленными плагинами для отладки python:
+  https://github.com/pojokcodeid/NvChad-v2-config
