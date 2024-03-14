@@ -1,6 +1,7 @@
 *hotkeys.txt*
 
-  Neovim и Vim - краткий справочник
+
+Neovim и Vim - краткий справочник
 https://neovim.io/doc/user/vimindex.html Официальная документация по всем комбинациям клавиш
 https://vimhelp.org/ FAQ по vim
 https://vim.fandom.com/wiki/Vim_Tips_Wiki - wiki по vim
@@ -30,6 +31,9 @@ https://vim.fandom.com/wiki/Vim_Tips_Wiki - wiki по vim
 |s19|. Используемые плагины
 
 *t01*. Горячие клавиши TMUX:
+<C-b> <space> - Переключить панели вертикально\горизонтально, Select next layout
+<C-b> PgUp - Перейти в режим прокрутки/выделения текста
+
 *панели*
 <C-b> z - zoom active panel. Увеличить панель до полного экрана
 <C-b> x - закрыть активную панель (exit)
@@ -41,6 +45,7 @@ https://vim.fandom.com/wiki/Vim_Tips_Wiki - wiki по vim
 <C-b> , - переименовать окно
 
 *сессии*
+<C-b> $ - rename session
 <C-b> d - detach from session
 <C-b> Shift+c - новая сессия
 <C-b> Shfit-( - Следующая сессия
@@ -49,13 +54,26 @@ https://vim.fandom.com/wiki/Vim_Tips_Wiki - wiki по vim
 *Горячие_клавиши*
 
 *s01* Новые
+<leader> th - выбор темы (тема записывается в ~/.config/nvim/lua/custom/chadrc.lua)
+<leader> fz - поиск функций в текущем буфере
+Shift+S - Удалить содержимое текущей строки и перейти в режим редактирования
+2<Shift+S> - удалить 2 строки снизу и перейти в режим редактирование пустой строки
+Ctrl +- - Масштаб (Увеличить/Уменьшить шрифт в Windows Terminal)
 5 Shift+S - удалить 5 строк и перейти в режим редактирования
 ge - перейти на конец предыдущего слова
 g_ - перейти на последний непробельный символ строки
 ^ - перейти на первый непробельный символ строки
-viw, vi()[]{}, vip 
-yiw, yi()[]{}, yip
-vaw, va()[]{}, vap 
+
+viw, vi()[]{}, vip - выделить слово под курсором, текст между скобок, параграф
+vaw, va()[]{}, vap - выделить слово с ближайшим пробелом, тест со скобками, параграф с
+новой строкой
+
+yiw, yi()[]{}, yip - копировать слово под курсором, текст между скобками. параграф
+yaw, ya()[]{}, yap - копировать слово с ближайшим пробелом, текст со скобками, параграф
+с новой строкой
+
+daw, di()[]{}, dap - удалить слово под курсором
+
 Ctrl+4 - Toggle float terminal (не работает в Tmux)
 <leader> t f - Toggle float terminal 
 Alt+I - Toggle small float terminal
