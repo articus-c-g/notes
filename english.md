@@ -1,3 +1,9 @@
+Aside - в сторону Aside from - Помимо Aside from being - Помимо того что Aside
+from being packaged - помимо того что в комплекте Aside from being packaged
+with - помимо того что он поставляется с Aside from being packaged with the
+download kits - Помимо того, что в комплект поставки входят наборы для
+скачивания
+
 There are many _conveniences_ of using IDE - существует много _преимуществ_
 использовать IDE
 
