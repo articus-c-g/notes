@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>GAWK&lpar;1&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="gawk1">GAWK(1)</h1>
+<p>Книга на русском:
+Смотрите GAWK: Эффективное программирование на AWK для полного списка участников gawk и его документации.
+mphttp://www.crossplatform.ru/documentation/awk/awk_bal_oglav.php</p>
+<ul>
+<li><a href="#gawk1">GAWK(1)</a>
+<ul>
+<li><a href="#%D0%B8%D0%BC%D1%8F-%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F">ИМЯ, ВЕРСИЯ</a></li>
+<li><a href="#%D1%81%D0%B8%D0%BD%D1%82%D0%B0%D0%BA%D1%81%D0%B8%D1%81">СИНТАКСИС</a></li>
+<li><a href="#%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5">ОПИСАНИЕ</a></li>
+<li><a href="#%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%82-%D0%BF%D0%B0%D1%80%D0%B0%D0%BC%D0%B5%D1%82%D1%80%D0%BE%D0%B2">ФОРМАТ ПАРАМЕТРОВ</a></li>
+<li><a href="#%D0%BF%D0%B0%D1%80%D0%B0%D0%BC%D0%B5%D1%82%D1%80%D1%8B">ПАРАМЕТРЫ</a>
+<ul>
+<li><a href="#-f-%D1%84%D0%B0%D0%B9%D0%BB-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B---file-%D1%84%D0%B0%D0%B9%D0%BB-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B"><code>-f</code> файл-программы, <code>--file</code> файл-программы</a></li>
+<li><a href="#-f-fs---field-separator-fs"><code>-F</code> fs, <code>--field-separator</code> fs</a></li>
+<li><a href="#-v-varval---assign-varval"><code>-v</code> var=val, <code>--assign</code> var=val</a></li>
+<li><a href="#-b---characters-as-bytes"><code>-b</code>, <code>--characters-as-bytes</code></a></li>
+<li><a href="#-c---traditional"><code>-c</code>, <code>--traditional</code></a></li>
+<li><a href="#-c---copyright"><code>-C</code>, <code>--copyright</code></a></li>
+<li><a href="#-dfile---dump-variablesfile"><code>-d[file]</code>, <code>--dump-variables[=file]</code></a></li>
+<li><a href="#-dfile---debugfile"><code>-D</code>[file], <code>--debug</code>[=file]</a></li>
+<li><a href="#-e-%D1%82%D0%B5%D0%BA%D1%81%D1%82-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B---source-%D1%82%D0%B5%D0%BA%D1%81%D1%82-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B"><code>-e</code> текст-программы, <code>--source</code> текст-программы</a></li>
+<li><a href="#-e-%D1%84%D0%B0%D0%B9%D0%BB---exec-%D1%84%D0%B0%D0%B9%D0%BB"><code>-E</code> файл, <code>--exec</code> файл</a></li>
+<li><a href="#-g---gen-pot"><code>-g</code>, <code>--gen-pot</code></a></li>
+<li><a href="#-h---help"><code>-h</code>, <code>--help</code></a></li>
+<li><a href="#-i-%D1%84%D0%B0%D0%B9%D0%BB-%D0%B2%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D1%8F---include-%D1%84%D0%B0%D0%B9%D0%BB-%D0%B2%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D1%8F"><code>-i</code> файл-включения, <code>--include</code> файл-включения</a></li>
+<li><a href="#-l-lib---load-lib"><code>-l</code> lib, <code>--load</code> lib</a></li>
+<li><a href="#-l-%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5---lint%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5"><code>-L</code> [значение], <code>--lint</code>[=значение]</a></li>
+<li><a href="#-m---bignum"><code>-M</code>, <code>--bignum</code></a></li>
+<li><a href="#-n---non-decimal-data"><code>-n</code>, <code>--non-decimal-data</code></a></li>
+<li><a href="#-n---use-lc-numeric"><code>-N</code>, <code>--use-lc-numeric</code></a></li>
+<li><a href="#-o%D1%84%D0%B0%D0%B9%D0%BB---pretty-print%D1%84%D0%B0%D0%B9%D0%BB"><code>-o</code>[файл], <code>--pretty-print</code>[=файл]</a></li>
+<li><a href="#-o--optimize"><code>-O</code>,<code>--optimize</code></a></li>
+<li><a href="#-p%D1%84%D0%B0%D0%B9%D0%BB-%D0%BF%D1%80%D0%BE%D1%84%D0%B8%D0%BB%D1%8F---profile%D1%84%D0%B0%D0%B9%D0%BB-%D0%BF%D1%80%D0%BE%D1%84%D0%B8%D0%BB%D1%8F"><code>-p</code>[файл-профиля], <code>--profile</code>[=файл-профиля]</a></li>
+<li><a href="#-p---posix"><code>-P</code>, <code>--posix</code></a></li>
+<li><a href="#-r---re-interval"><code>-r</code>, <code>--re-interval</code></a></li>
+<li><a href="#-s---no-optimize"><code>-s</code>, <code>--no-optimize</code></a></li>
+<li><a href="#-s---sandbox"><code>-S</code>, <code>--sandbox</code></a></li>
+<li><a href="#-t---lint-old"><code>-t</code>, <code>--lint-old</code></a></li>
+<li><a href="#-v---version"><code>-V</code>, <code>--version</code></a></li>
+<li><a href="#--"><code>--</code></a></li>
+</ul>
+</li>
+<li><a href="#%D0%B2%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC-awk">ВЫПОЛНЕНИЕ ПРОГРАММ AWK</a>
+<ul>
+<li><a href="#%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%BD%D1%8B%D0%B5-%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%B8">Командные строки</a></li>
+</ul>
+</li>
+<li><a href="#%D0%BF%D0%B5%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5-%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D0%B8-%D0%B8-%D0%BF%D0%BE%D0%BB%D1%8F">ПЕРЕМЕННЫЕ, ЗАПИСИ И ПОЛЯ</a>
+<ul>
+<li><a href="#%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D0%B8">Записи</a></li>
+<li><a href="#%D0%BF%D0%BE%D0%BB%D1%8F">Поля</a></li>
+<li><a href="#%D0%B2%D1%81%D1%82%D1%80%D0%BE%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5-%D0%BF%D0%B5%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5">Встроенные переменные</a>
+<ul>
+<li><a href="#argc"><code>ARGC</code></a></li>
+<li><a href="#argind"><code>ARGIND</code></a></li>
+<li><a href="#argv"><code>ARGV</code></a></li>
+<li><a href="#binmode"><code>BINMODE</code></a></li>
+<li><a href="#convfmt"><code>CONVFMT</code></a></li>
+<li><a href="#environ"><code>ENVIRON</code></a></li>
+<li><a href="#errno"><code>ERRNO</code></a></li>
+<li><a href="#fieldwidths"><code>FIELDWIDTHS</code></a></li>
+<li><a href="#filename"><code>FILENAME</code></a></li>
+<li><a href="#fnr"><code>FNR</code></a></li>
+<li><a href="#fpat"><code>FPAT</code></a></li>
+<li><a href="#fs"><code>FS</code></a></li>
+<li><a href="#functab"><code>FUNCTAB</code></a></li>
+<li><a href="#ignorecase"><code>IGNORECASE</code></a></li>
+<li><a href="#lint"><code>LINT</code></a></li>
+<li><a href="#nf"><code>NF</code></a></li>
+<li><a href="#nr"><code>NR</code></a></li>
+<li><a href="#ofmt"><code>OFMT</code></a></li>
+<li><a href="#ofs"><code>OFS</code></a></li>
+<li><a href="#ors"><code>ORS</code></a></li>
+<li><a href="#prec"><code>PREC</code></a></li>
+<li><a href="#procinfo"><code>PROCINFO</code></a>
+<ul>
+<li><a href="#procinfoargv-----%D0%B0%D1%80%D0%B3%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D1%8B-%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%BD%D0%BE%D0%B9-%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%B8-%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5-gawk-%D0%BD%D0%B0-%D1%83%D1%80%D0%BE%D0%B2%D0%BD%D0%B5-%D1%8F%D0%B7%D1%8B%D0%BA%D0%B0-c-%D0%B8%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D1%8B-%D0%BD%D0%B0%D1%87%D0%B8%D0%BD%D0%B0%D1%8E%D1%82%D1%81%D1%8F-%D1%81-%D0%BD%D1%83%D0%BB%D1%8F"><code>PROCINFO</code>[&quot;argv&quot;]     Аргументы командной строки, полученные gawk на уровне языка C. Индексы начинаются с нуля.</a></li>
+<li><a href="#procinfoegid-----%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5-%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%BD%D0%BE%D0%B3%D0%BE-%D0%B2%D1%8B%D0%B7%D0%BE%D0%B2%D0%B0-getegid2"><code>PROCINFO</code>[&quot;egid&quot;]     Значение системного вызова getegid(2).</a></li>
+<li><a href="#procinfoerrno----%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5-errno3-%D0%BA%D0%BE%D0%B3%D0%B4%D0%B0-errno-%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%BE-%D0%B2-%D1%81%D0%BE%D0%BE%D1%82%D0%B2%D0%B5%D1%82%D1%81%D1%82%D0%B2%D1%83%D1%8E%D1%89%D0%B5%D0%B5-%D1%81%D0%BE%D0%BE%D0%B1%D1%89%D0%B5%D0%BD%D0%B8%D0%B5-%D0%BE%D0%B1-%D0%BE%D1%88%D0%B8%D0%B1%D0%BA%D0%B5"><code>PROCINFO</code>[&quot;errno&quot;]    Значение errno(3), когда ERRNO установлено в соответствующее сообщение об ошибке.</a></li>
+<li><a href="#procinfoeuid-----%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5-%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%BD%D0%BE%D0%B3%D0%BE-%D0%B2%D1%8B%D0%B7%D0%BE%D0%B2%D0%B0-geteuid2"><code>PROCINFO</code>[&quot;euid&quot;]     Значение системного вызова geteuid(2).</a></li>
+<li><a href="#procinfogid------%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5-%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%BD%D0%BE%D0%B3%D0%BE-%D0%B2%D1%8B%D0%B7%D0%BE%D0%B2%D0%B0-getgid2"><code>PROCINFO</code>[&quot;gid&quot;]      Значение системного вызова getgid(2).</a></li>
+<li><a href="#procinfoidentifiers-%D0%BF%D0%BE%D0%B4%D0%BC%D0%B0%D1%81%D1%81%D0%B8%D0%B2-%D0%B8%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D0%B8%D1%80%D1%83%D0%B5%D0%BC%D1%8B%D0%B9-%D0%B8%D0%BC%D0%B5%D0%BD%D0%B0%D0%BC%D0%B8-%D0%B2%D1%81%D0%B5%D1%85-%D0%B8%D0%B4%D0%B5%D0%BD%D1%82%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%82%D0%BE%D1%80%D0%BE%D0%B2-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D0%BC%D1%8B%D1%85-%D0%B2-%D1%82%D0%B5%D0%BA%D1%81%D1%82%D0%B5-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B-awk"><code>PROCINFO</code>[&quot;identifiers&quot;] Подмассив, индексируемый именами всех идентификаторов, используемых в тексте программы AWK.</a></li>
+<li><a href="#procinfopgrpid----%D0%B8%D0%B4%D0%B5%D0%BD%D1%82%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%82%D0%BE%D1%80-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D1%8B-%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D1%81%D1%81%D0%BE%D0%B2-%D1%82%D0%B5%D0%BA%D1%83%D1%89%D0%B5%D0%B3%D0%BE-%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D1%81%D1%81%D0%B0"><code>PROCINFO</code>[&quot;pgrpid&quot;]    Идентификатор группы процессов текущего процесса.</a></li>
+<li><a href="#procinfopid-------%D0%B8%D0%B4%D0%B5%D0%BD%D1%82%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%82%D0%BE%D1%80-%D1%82%D0%B5%D0%BA%D1%83%D1%89%D0%B5%D0%B3%D0%BE-%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D1%81%D1%81%D0%B0"><code>PROCINFO</code>[&quot;pid&quot;]       Идентификатор текущего процесса.</a></li>
+<li><a href="#procinfoppid------%D0%B8%D0%B4%D0%B5%D0%BD%D1%82%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%82%D0%BE%D1%80-%D1%80%D0%BE%D0%B4%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%BE%D0%B3%D0%BE-%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D1%81%D1%81%D0%B0-%D1%82%D0%B5%D0%BA%D1%83%D1%89%D0%B5%D0%B3%D0%BE-%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D1%81%D1%81%D0%B0"><code>PROCINFO</code>[&quot;ppid&quot;]      Идентификатор родительского процесса текущего процесса.</a></li>
+<li><a href="#procinfostrftime--%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%B0-%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%82%D0%B0-%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%B8-%D0%BF%D0%BE-%D1%83%D0%BC%D0%BE%D0%BB%D1%87%D0%B0%D0%BD%D0%B8%D1%8E-%D0%B4%D0%BB%D1%8F-strftime"><code>PROCINFO</code>[&quot;strftime&quot;]  Строка формата времени по умолчанию для strftime().</a></li>
+<li><a href="#procinfouid-------%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5-%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%BD%D0%BE%D0%B3%D0%BE-%D0%B2%D1%8B%D0%B7%D0%BE%D0%B2%D0%B0-getuid2"><code>PROCINFO</code>[&quot;uid&quot;]       Значение системного вызова getuid(2).</a></li>
+<li><a href="#%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D1%8F-%D1%81%D0%BB%D0%B5%D0%B4%D1%83%D1%8E%D1%89%D0%B8%D1%85-%D1%8D%D0%BB%D0%B5%D0%BC%D0%B5%D0%BD%D1%82%D0%BE%D0%B2-%D0%BF%D1%80%D0%B8%D1%81%D1%83%D1%82%D1%81%D1%82%D0%B2%D1%83%D1%8E%D1%82-%D0%B5%D1%81%D0%BB%D0%B8-%D0%B4%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D0%B0-%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B0-%D0%B4%D0%B8%D0%BD%D0%B0%D0%BC%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85-%D1%80%D0%B0%D1%81%D1%88%D0%B8%D1%80%D0%B5%D0%BD%D0%B8%D0%B9">Значения следующих элементов присутствуют, если доступна загрузка динамических расширений:</a>
+<ul>
+<li><a href="#procinfoapi_major--%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D0%B0%D1%8F-%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F-api-%D1%80%D0%B0%D1%81%D1%88%D0%B8%D1%80%D0%B5%D0%BD%D0%B8%D1%8F"><code>PROCINFO</code>[&quot;api_major&quot;]  Основная версия API расширения.</a></li>
+<li><a href="#procinfoapi_minor--%D0%B2%D1%82%D0%BE%D1%80%D0%BE%D1%81%D1%82%D0%B5%D0%BF%D0%B5%D0%BD%D0%BD%D0%B0%D1%8F-%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F-api-%D1%80%D0%B0%D1%81%D1%88%D0%B8%D1%80%D0%B5%D0%BD%D0%B8%D1%8F"><code>PROCINFO</code>[&quot;api_minor&quot;]  Второстепенная версия API расширения.</a></li>
+</ul>
+</li>
+<li><a href="#%D1%81%D0%BB%D0%B5%D0%B4%D1%83%D1%8E%D1%89%D0%B8%D0%B5-%D1%8D%D0%BB%D0%B5%D0%BC%D0%B5%D0%BD%D1%82%D1%8B-%D0%B4%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D1%8B-%D0%B5%D1%81%D0%BB%D0%B8-%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0-mpfr-%D1%81%D0%BA%D0%BE%D0%BC%D0%BF%D0%B8%D0%BB%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B0-%D0%B2-gawk">Следующие элементы доступны, если поддержка MPFR скомпилирована в gawk:</a>
+<ul>
+<li><a href="#procinfogmp_version--%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F-%D0%B1%D0%B8%D0%B1%D0%BB%D0%B8%D0%BE%D1%82%D0%B5%D0%BA%D0%B8-gnu-mp-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D0%BC%D0%BE%D0%B9-%D0%B4%D0%BB%D1%8F-%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B8-%D1%87%D0%B8%D1%81%D0%B5%D0%BB-%D1%81-%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%BB%D1%8C%D0%BD%D0%BE%D0%B9-%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D1%81%D1%82%D1%8C%D1%8E-%D0%B2-gawk"><code>PROCINFO</code>[&quot;gmp_version&quot;]  Версия библиотеки GNU MP, используемой для поддержки чисел с произвольной точностью в gawk.</a></li>
+<li><a href="#procinfompfr_version--%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F-%D0%B1%D0%B8%D0%B1%D0%BB%D0%B8%D0%BE%D1%82%D0%B5%D0%BA%D0%B8-gnu-mpfr-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D0%BC%D0%BE%D0%B9-%D0%B4%D0%BB%D1%8F-%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B8-%D1%87%D0%B8%D1%81%D0%B5%D0%BB-%D1%81-%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%BB%D1%8C%D0%BD%D0%BE%D0%B9-%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D1%81%D1%82%D1%8C%D1%8E-%D0%B2-gawk"><code>PROCINFO</code>[&quot;mpfr_version&quot;]  Версия библиотеки GNU MPFR, используемой для поддержки чисел с произвольной точностью в gawk.</a></li>
+<li><a href="#procinfoprec_max--%D0%BC%D0%B0%D0%BA%D1%81%D0%B8%D0%BC%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F-%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B8%D0%B2%D0%B0%D0%B5%D0%BC%D0%B0%D1%8F-%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D1%81%D1%82%D1%8C-%D0%B1%D0%B8%D0%B1%D0%BB%D0%B8%D0%BE%D1%82%D0%B5%D0%BA%D0%BE%D0%B9-gnu-mpfr-%D0%B4%D0%BB%D1%8F-%D1%87%D0%B8%D1%81%D0%B5%D0%BB-%D1%81-%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%BB%D1%8C%D0%BD%D0%BE%D0%B9-%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D1%81%D1%82%D1%8C%D1%8E"><code>PROCINFO</code>[&quot;prec_max&quot;]  Максимальная поддерживаемая точность библиотекой GNU MPFR для чисел с произвольной точностью.</a></li>
+<li><a href="#procinfoprec_min--%D0%BC%D0%B8%D0%BD%D0%B8%D0%BC%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F-%D0%B4%D0%BE%D0%BF%D1%83%D1%81%D1%82%D0%B8%D0%BC%D0%B0%D1%8F-%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D1%81%D1%82%D1%8C-%D0%B1%D0%B8%D0%B1%D0%BB%D0%B8%D0%BE%D1%82%D0%B5%D0%BA%D0%BE%D0%B9-gnu-mpfr-%D0%B4%D0%BB%D1%8F-%D1%87%D0%B8%D1%81%D0%B5%D0%BB-%D1%81-%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%BB%D1%8C%D0%BD%D0%BE%D0%B9-%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D1%81%D1%82%D1%8C%D1%8E"><code>PROCINFO</code>[&quot;prec_min&quot;]  Минимальная допустимая точность библиотекой GNU MPFR для чисел с произвольной точностью.</a></li>
+</ul>
+</li>
+<li><a href="#%D1%81%D0%BB%D0%B5%D0%B4%D1%83%D1%8E%D1%89%D0%B8%D0%B5-%D1%8D%D0%BB%D0%B5%D0%BC%D0%B5%D0%BD%D1%82%D1%8B-%D0%BC%D0%BE%D0%B3%D1%83%D1%82-%D0%B1%D1%8B%D1%82%D1%8C-%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D1%8B-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%BE%D0%B9-%D0%B4%D0%BB%D1%8F-%D0%B8%D0%B7%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BF%D0%BE%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F-gawk">Следующие элементы могут быть установлены программой для изменения поведения gawk:</a>
+<ul>
+<li><a href="#procinfononfatal--%D0%B5%D1%81%D0%BB%D0%B8-%D1%8D%D1%82%D0%BE-%D1%81%D1%83%D1%89%D0%B5%D1%81%D1%82%D0%B2%D1%83%D0%B5%D1%82-%D1%82%D0%BE-%D0%BE%D1%88%D0%B8%D0%B1%D0%BA%D0%B8-%D0%B2%D0%B2%D0%BE%D0%B4%D0%B0-%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%B0-%D0%B4%D0%BB%D1%8F-%D0%B2%D1%81%D0%B5%D1%85-%D0%BF%D0%B5%D1%80%D0%B5%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B9-%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D1%8F%D1%82%D1%81%D1%8F-%D0%BD%D0%B5%D1%84%D0%B0%D1%82%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%BC%D0%B8"><code>PROCINFO</code>[&quot;NONFATAL&quot;]  Если это существует, то ошибки ввода-вывода для всех перенаправлений становятся нефатальными.</a></li>
+<li><a href="#procinfoame-nonfatal--%D0%B4%D0%B5%D0%BB%D0%B0%D0%B5%D1%82-%D0%BE%D1%88%D0%B8%D0%B1%D0%BA%D0%B8-%D0%B2%D0%B2%D0%BE%D0%B4%D0%B0-%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%B0-%D0%B4%D0%BB%D1%8F-%D0%B8%D0%BC%D0%B5%D0%BD%D0%B8-%D0%BD%D0%B5%D1%84%D0%B0%D1%82%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%BC%D0%B8"><code>PROCINFO</code>[&quot;ame&quot;, &quot;NONFATAL&quot;]  Делает ошибки ввода-вывода для имени нефатальными.</a></li>
+<li><a href="#procinfocommand-pty--%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D1%82-%D0%BF%D1%81%D0%B5%D0%B2%D0%B4%D0%BE%D1%82%D0%B5%D1%80%D0%BC%D0%B8%D0%BD%D0%B0%D0%BB-%D0%B4%D0%BB%D1%8F-%D0%B4%D0%B2%D1%83%D1%81%D1%82%D0%BE%D1%80%D0%BE%D0%BD%D0%BD%D0%B5%D0%B9-%D1%81%D0%B2%D1%8F%D0%B7%D0%B8-%D1%81-%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%BE%D0%B9-%D0%B2%D0%BC%D0%B5%D1%81%D1%82%D0%BE-%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B8-%D0%B4%D0%B2%D1%83%D1%85-%D0%BE%D0%B4%D0%BD%D0%BE%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D1%85-%D1%82%D1%80%D1%83%D0%B1"><code>PROCINFO</code>[&quot;command&quot;, &quot;pty&quot;]  Использует псевдотерминал для двусторонней связи с командой вместо настройки двух однонаправленных труб.</a></li>
+<li><a href="#procinfoinput-read_timeout-%D1%82%D0%B0%D0%B9%D0%BC%D0%B0%D1%83%D1%82-%D0%B2-%D0%BC%D0%B8%D0%BB%D0%BB%D0%B8%D1%81%D0%B5%D0%BA%D1%83%D0%BD%D0%B4%D0%B0%D1%85-%D0%B4%D0%BB%D1%8F-%D1%87%D1%82%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85-%D0%B8%D0%B7-%D0%B2%D0%B2%D0%BE%D0%B4%D0%B0"><code>PROCINFO</code>[&quot;input&quot;, &quot;READ_TIMEOUT&quot;] Таймаут в миллисекундах для чтения данных из ввода</a></li>
+<li><a href="#procinfoinput-retry"><code>PROCINFO</code>[&quot;input&quot;, &quot;RETRY&quot;]</a></li>
+<li><a href="#procinfosorted_in"><code>PROCINFO</code>[&quot;sorted_in&quot;]</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#roundmode--%D1%80%D0%B5%D0%B6%D0%B8%D0%BC-%D0%BE%D0%BA%D1%80%D1%83%D0%B3%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D0%BC%D1%8B%D0%B9-%D0%B4%D0%BB%D1%8F-%D0%B0%D1%80%D0%B8%D1%84%D0%BC%D0%B5%D1%82%D0%B8%D0%BA%D0%B8-%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%BB%D1%8C%D0%BD%D0%BE%D0%B9-%D1%82%D0%BE%D1%87%D0%BD%D0%BE%D1%81%D1%82%D0%B8-%D0%B4%D0%BB%D1%8F-%D1%87%D0%B8%D1%81%D0%B5%D0%BB"><code>ROUNDMODE</code>  Режим округления, используемый для арифметики произвольной точности для чисел</a></li>
+<li><a href="#rs--%D1%80%D0%B0%D0%B7%D0%B4%D0%B5%D0%BB%D0%B8%D1%82%D0%B5%D0%BB%D1%8C-%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D0%B5%D0%B9-%D0%B2%D0%B2%D0%BE%D0%B4%D0%B0-%D0%BF%D0%BE-%D1%83%D0%BC%D0%BE%D0%BB%D1%87%D0%B0%D0%BD%D0%B8%D1%8E-%D1%81%D0%B8%D0%BC%D0%B2%D0%BE%D0%BB-%D0%BD%D0%BE%D0%B2%D0%BE%D0%B9-%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%B8"><code>RS</code>  Разделитель записей ввода, по умолчанию символ новой строки.</a></li>
+<li><a href="#rt--%D0%B7%D0%B0%D0%B2%D0%B5%D1%80%D1%88%D0%B8%D1%82%D0%B5%D0%BB%D1%8C-%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D0%B8-gawk-%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%B0%D0%B2%D0%BB%D0%B8%D0%B2%D0%B0%D0%B5%D1%82-rt-%D0%B2-%D1%82%D0%B5%D0%BA%D1%81%D1%82-%D0%B2%D0%B2%D0%BE%D0%B4%D0%B0-%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D1%8B%D0%B9-%D1%81%D0%BE%D0%BE%D1%82%D0%B2%D0%B5%D1%82%D1%81%D1%82%D0%B2%D1%83%D0%B5%D1%82-%D1%81%D0%B8%D0%BC%D0%B2%D0%BE%D0%BB%D1%83-%D0%B8%D0%BB%D0%B8-%D1%80%D0%B5%D0%B3%D1%83%D0%BB%D1%8F%D1%80%D0%BD%D0%BE%D0%BC%D1%83-%D0%B2%D1%8B%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%B8%D1%8E-%D1%83%D0%BA%D0%B0%D0%B7%D0%B0%D0%BD%D0%BD%D0%BE%D0%BC%D1%83-rs"><code>RT</code>  Завершитель записи. Gawk устанавливает RT в текст ввода, который соответствует символу или регулярному выражению, указанному RS.</a></li>
+<li><a href="#rstart--%D0%B8%D0%BD%D0%B4%D0%B5%D0%BA%D1%81-%D0%BF%D0%B5%D1%80%D0%B2%D0%BE%D0%B3%D0%BE-%D1%81%D0%B8%D0%BC%D0%B2%D0%BE%D0%BB%D0%B0-%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B2%D1%88%D0%B5%D0%B3%D0%BE-%D1%81-match-0-%D0%B5%D1%81%D0%BB%D0%B8-%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BD%D0%B5%D1%82--%D1%8D%D1%82%D0%BE-%D0%BF%D0%BE%D0%B4%D1%80%D0%B0%D0%B7%D1%83%D0%BC%D0%B5%D0%B2%D0%B0%D0%B5%D1%82-%D1%87%D1%82%D0%BE-%D0%B8%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D1%8B-%D1%81%D0%B8%D0%BC%D0%B2%D0%BE%D0%BB%D0%BE%D0%B2-%D0%BD%D0%B0%D1%87%D0%B8%D0%BD%D0%B0%D1%8E%D1%82%D1%81%D1%8F-%D1%81-%D0%B5%D0%B4%D0%B8%D0%BD%D0%B8%D1%86%D1%8B-"><code>RSTART</code>  Индекс первого символа, совпавшего с match(); 0, если совпадения нет. ( Это подразумевает, что индексы символов начинаются с единицы. )</a></li>
+<li><a href="#rlength--%D0%B4%D0%BB%D0%B8%D0%BD%D0%B0-%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%B8-%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B2%D1%88%D0%B5%D0%B9-%D1%81-match--1-%D0%B5%D1%81%D0%BB%D0%B8-%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BD%D0%B5%D1%82"><code>RLENGTH</code>  Длина строки, совпавшей с match(); -1, если совпадения нет.</a></li>
+<li><a href="#subsep--%D1%81%D0%B8%D0%BC%D0%B2%D0%BE%D0%BB-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D0%BC%D1%8B%D0%B9-%D0%B4%D0%BB%D1%8F-%D1%80%D0%B0%D0%B7%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BD%D0%B5%D1%81%D0%BA%D0%BE%D0%BB%D1%8C%D0%BA%D0%B8%D1%85-%D0%B8%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D0%BE%D0%B2-%D0%B2-%D1%8D%D0%BB%D0%B5%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%85-%D0%BC%D0%B0%D1%81%D1%81%D0%B8%D0%B2%D0%B0-%D0%BF%D0%BE-%D1%83%D0%BC%D0%BE%D0%BB%D1%87%D0%B0%D0%BD%D0%B8%D1%8E-034"><code>SUBSEP</code>  Символ, используемый для разделения нескольких индексов в элементах массива, по умолчанию &quot;\034&quot;.</a></li>
+<li><a href="#symtab--%D0%BC%D0%B0%D1%81%D1%81%D0%B8%D0%B2-%D0%B8%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D1%8B-%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D0%BE%D0%B3%D0%BE-%D1%8F%D0%B2%D0%BB%D1%8F%D1%8E%D1%82%D1%81%D1%8F-%D0%B8%D0%BC%D0%B5%D0%BD%D0%B0%D0%BC%D0%B8-%D0%B2%D1%81%D0%B5%D1%85-%D1%82%D0%B5%D0%BA%D1%83%D1%89%D0%B8%D1%85-%D0%B3%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D1%85-%D0%BF%D0%B5%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D1%85-%D0%B8-%D0%BC%D0%B0%D1%81%D1%81%D0%B8%D0%B2%D0%BE%D0%B2-%D0%B2-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B5"><code>SYMTAB</code>  Массив, индексы которого являются именами всех текущих глобальных переменных и массивов в программе.</a></li>
+<li><a href="#textdomain--%D1%82%D0%B5%D0%BA%D1%81%D1%82%D0%BE%D0%B2%D1%8B%D0%B9-%D0%B4%D0%BE%D0%BC%D0%B5%D0%BD-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B-awk-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D1%82%D1%81%D1%8F-%D0%B4%D0%BB%D1%8F-%D0%BF%D0%BE%D0%B8%D1%81%D0%BA%D0%B0-%D0%BB%D0%BE%D0%BA%D0%B0%D0%BB%D0%B8%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D1%8B%D1%85-%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4%D0%BE%D0%B2-%D1%81%D1%82%D1%80%D0%BE%D0%BA-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B"><code>TEXTDOMAIN</code>  Текстовый домен программы AWK; используется для поиска локализованных переводов строк программы.</a></li>
+</ul>
+</li>
+<li><a href="#%D0%BC%D0%B0%D1%81%D1%81%D0%B8%D0%B2%D1%8B">Массивы</a></li>
+<li><a href="#%D1%82%D0%B8%D0%BF%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F-%D0%BF%D0%B5%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D1%85-%D0%B8-%D0%BF%D1%80%D0%B5%D0%BE%D0%B1%D1%80%D0%B0%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5">Типизация переменных и преобразование</a></li>
+<li><a href="#%D0%B2%D0%BE%D1%81%D1%8C%D0%BC%D0%B5%D1%80%D0%B8%D1%87%D0%BD%D1%8B%D0%B5-%D0%B8-%D1%88%D0%B5%D1%81%D1%82%D0%BD%D0%B0%D0%B4%D1%86%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D1%87%D0%BD%D1%8B%D0%B5-%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D0%B0%D0%BD%D1%82%D1%8B">Восьмеричные и шестнадцатеричные константы</a></li>
+<li><a href="#%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%BE%D0%B2%D1%8B%D0%B5-%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D0%B0%D0%BD%D1%82%D1%8B">Строковые константы</a></li>
+<li><a href="#%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D0%B0%D0%BD%D1%82%D1%8B-%D1%80%D0%B5%D0%B3%D1%83%D0%BB%D1%8F%D1%80%D0%BD%D1%8B%D1%85-%D0%B2%D1%8B%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%B8%D0%B9">Константы регулярных выражений</a></li>
+</ul>
+</li>
+<li><a href="#%D1%88%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD%D1%8B-%D0%B8-%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D1%8F">ШАБЛОНЫ И ДЕЙСТВИЯ</a>
+<ul>
+<li><a href="#%D1%88%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD%D1%8B">Шаблоны</a></li>
+<li><a href="#%D1%80%D0%B5%D0%B3%D1%83%D0%BB%D1%8F%D1%80%D0%BD%D1%8B%D0%B5-%D0%B2%D1%8B%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F">Регулярные выражения</a>
+<ul>
+<li><a href="#escape-%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8-escape-sequences">Escape-последовательности (Escape Sequences)</a></li>
+<li><a href="#%D0%BA%D0%BB%D0%B0%D1%81%D1%81%D1%8B-%D1%81%D0%B8%D0%BC%D0%B2%D0%BE%D0%BB%D0%BE%D0%B2-character-classes">Классы символов (Character Classes)</a></li>
+<li><a href="#%D1%81%D0%B8%D0%BC%D0%B2%D0%BE%D0%BB-%D1%81%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B8-collating-symbols">Символ сортировки (Collating Symbols)</a></li>
+<li><a href="#%D0%BA%D0%BB%D0%B0%D1%81%D1%81-%D1%8D%D0%BA%D0%B2%D0%B8%D0%B2%D0%B0%D0%BB%D0%B5%D0%BD%D1%82%D0%BD%D0%BE%D1%81%D1%82%D0%B8-equivalence-classes">Класс эквивалентности (Equivalence Classes)</a></li>
+</ul>
+</li>
+<li><a href="#%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D1%8F-actions">Действия (Actions)</a></li>
+<li><a href="#%D0%BE%D0%BF%D0%B5%D1%80%D0%B0%D1%82%D0%BE%D1%80%D1%8B-operators">Операторы (Operators)</a></li>
+<li><a href="#%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D1%8F%D1%8E%D1%89%D0%B8%D0%B5-%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B8-control-statements">Управляющие конструкции (Control Statements)</a></li>
+<li><a href="#%D0%BE%D0%BF%D0%B5%D1%80%D0%B0%D1%82%D0%BE%D1%80%D1%8B-%D0%B2%D0%B2%D0%BE%D0%B4%D0%B0%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%B0-io-statements">Операторы ввода/вывода (I/O Statements)</a></li>
+<li><a href="#%D0%BE%D0%BF%D0%B5%D1%80%D0%B0%D1%82%D0%BE%D1%80-printf">Оператор printf</a></li>
+<li><a href="#%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5-%D0%B8%D0%BC%D0%B5%D0%BD%D0%B0-%D1%84%D0%B0%D0%B9%D0%BB%D0%BE%D0%B2">Специальные имена файлов</a></li>
+<li><a href="#%D1%87%D0%B8%D1%81%D0%BB%D0%BE%D0%B2%D1%8B%D0%B5-%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%B8">Числовые функции</a></li>
+<li><a href="#%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%BE%D0%B2%D1%8B%D0%B5-%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%B8">Строковые функции</a></li>
+<li><a href="#%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%B8-%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%B8">Функции времени</a>
+<ul>
+<li><a href="#mktimedatespec--utc-flag"><code>mktime(datespec [, utc-flag])</code></a></li>
+<li><a href="#strftimeformat--timestamp-utc-flag"><code>strftime([format [, timestamp[, utc-flag]]])</code></a></li>
+<li><a href="#systime"><code>systime()</code></a></li>
+</ul>
+</li>
+<li><a href="#%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%B8-%D0%BC%D0%B0%D0%BD%D0%B8%D0%BF%D1%83%D0%BB%D1%8F%D1%86%D0%B8%D0%B8-%D0%B1%D0%B8%D1%82%D0%B0%D0%BC%D0%B8">Функции манипуляции битами</a></li>
+<li><a href="#%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%B8-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2">Функции типов</a></li>
+<li><a href="#%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%B8-%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%BD%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8">Функции интернационализации</a></li>
+<li><a href="#%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B5-%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%B8">ПОЛЬЗОВАТЕЛЬСКИЕ ФУНКЦИИ</a></li>
+</ul>
+</li>
+<li><a href="#%D0%B4%D0%B8%D0%BD%D0%B0%D0%BC%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F-%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B0-%D0%BD%D0%BE%D0%B2%D1%8B%D1%85-%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%B9">ДИНАМИЧЕСКАЯ ЗАГРУЗКА НОВЫХ ФУНКЦИЙ</a></li>
+<li><a href="#%D1%81%D0%B8%D0%B3%D0%BD%D0%B0%D0%BB%D1%8B">СИГНАЛЫ</a></li>
+<li><a href="#%D0%BC%D0%B5%D0%B6%D0%B4%D1%83%D0%BD%D0%B0%D1%80%D0%BE%D0%B4%D0%BD%D0%B0%D1%8F-%D0%B0%D0%B4%D0%B0%D0%BF%D1%82%D0%B0%D1%86%D0%B8%D1%8F">МЕЖДУНАРОДНАЯ АДАПТАЦИЯ</a></li>
+<li><a href="#%D1%81%D0%BE%D0%B2%D0%BC%D0%B5%D1%81%D1%82%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C-%D1%81-posix">СОВМЕСТИМОСТЬ С POSIX</a></li>
+<li><a href="#%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5-%D0%BE%D1%81%D0%BE%D0%B1%D0%B5%D0%BD%D0%BD%D0%BE%D1%81%D1%82%D0%B8">ИСТОРИЧЕСКИЕ ОСОБЕННОСТИ</a></li>
+<li><a href="#%D1%80%D0%B0%D1%81%D1%88%D0%B8%D1%80%D0%B5%D0%BD%D0%B8%D1%8F-gnu">РАСШИРЕНИЯ GNU</a></li>
+<li><a href="#%D0%BF%D0%B5%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5-%D0%BE%D0%BA%D1%80%D1%83%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F">ПЕРЕМЕННЫЕ ОКРУЖЕНИЯ</a></li>
+<li><a href="#%D1%81%D1%82%D0%B0%D1%82%D1%83%D1%81-%D0%B2%D1%8B%D1%85%D0%BE%D0%B4%D0%B0-exit-code">СТАТУС ВЫХОДА (Exit Code)</a></li>
+<li><a href="#%D0%BE%D1%82%D1%87%D0%B5%D1%82%D1%8B-%D0%BE%D0%B1-%D0%BE%D1%88%D0%B8%D0%B1%D0%BA%D0%B0%D1%85">ОТЧЕТЫ ОБ ОШИБКАХ</a></li>
+<li><a href="#%D0%BE%D1%88%D0%B8%D0%B1%D0%BA%D0%B8">ОШИБКИ</a></li>
+<li><a href="#%D1%81%D0%BC%D0%BE%D1%82%D1%80%D0%B8%D1%82%D0%B5-%D1%82%D0%B0%D0%BA%D0%B6%D0%B5">СМОТРИТЕ ТАКЖЕ</a></li>
+<li><a href="#%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B">ПРИМЕРЫ</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="имя-версия">ИМЯ, ВЕРСИЯ</h2>
+<p>gawk - язык обработки и сканирования шаблонов
+Эта страница руководства документирует gawk, версия 4.2.</p>
+<h2 id="синтаксис">СИНТАКСИС</h2>
+<p>gawk [ параметры в стиле POSIX или GNU ] -f файл-программы [ -- ] файл ...
+gawk [ параметры в стиле POSIX или GNU ] [ -- ] текст-программы файл ...</p>
+<h2 id="описание">ОПИСАНИЕ</h2>
+<p>Gawk - это реализация языка AWK от проекта GNU. Он соответствует определению языка в стандарте POSIX 1003.1. Эта версия, в свою очередь, основана на описании в книге &quot;Язык программирования AWK&quot; авторов Ахо, Кернигана и Вайнбергера. Gawk предоставляет дополнительные функции, найденные в текущей версии awk Брайана Кернигана и многочисленные расширения, специфичные для GNU.</p>
+<p>Командная строка состоит из параметров для самого gawk, текста программы AWK ( если он не предоставлен через параметры -f или -i ) и значений, которые будут доступны в предопределённых переменных AWK ARGC и ARGV.</p>
+<p>Когда gawk вызывается с параметром --profile, он начинает собирать статистику профилирования во время выполнения программы. Gawk работает медленнее в этом режиме и автоматически создаёт профиль выполнения в файле awkprof.out по завершении. См. параметр --profile ниже.</p>
+<p>Gawk также имеет встроенный отладчик. Интерактивная сессия отладки может быть начата, если указать параметр --debug в командной строке. В этом режиме выполнения gawk загружает исходный код AWK и затем запрашивает команды отладки. Gawk может отлаживать только исходный код программы AWK, предоставленный с параметром -f. Отладчик документирован в GAWK: Эффективное программирование на AWK.</p>
+<h2 id="формат-параметров">ФОРМАТ ПАРАМЕТРОВ</h2>
+<p>Параметры gawk могут быть либо традиционными однобуквенными параметрами в стиле POSIX, либо длинными параметрами в стиле GNU. Параметры POSIX начинаются с одного &quot;–&quot;, в то время как длинные параметры начинаются с &quot;--&quot;. Длинные параметры предоставляются как для функций, специфичных для GNU, так и для функций, предписанных POSIX.</p>
+<p>Параметры, специфичные для gawk, обычно используются в форме длинного параметра. Аргументы длинных параметров либо соединяются с параметром знаком &quot;=&quot;, без промежуточных пробелов, либо могут быть предоставлены в следующем аргументе командной строки. Длинные параметры могут быть сокращены, при условии, что сокращение остаётся уникальным.</p>
+<p>Кроме того, у каждого длинного параметра есть соответствующий короткий параметр, так что функциональность параметра может быть использована в исполняемых скриптах #!.</p>
+<h2 id="параметры">ПАРАМЕТРЫ</h2>
+<p>Gawk принимает следующие параметры. Стандартные параметры перечислены первыми, за ними следуют параметры для расширений gawk, перечисленные в алфавитном порядке по короткому параметру.</p>
+<h4 id="-f-файл-программы---file-файл-программы"><code>-f</code> файл-программы, <code>--file</code> файл-программы</h4>
+<p>Чтение исходного кода программы AWK из файла файл-программы, вместо первого аргумента командной строки. Можно использовать несколько параметров -f ( или --file ).</p>
+<h4 id="-f-fs---field-separator-fs"><code>-F</code> fs, <code>--field-separator</code> fs</h4>
+<p>Использовать fs в качестве разделителя полей ввода ( значение предопределённой переменной FS ).</p>
+<h4 id="-v-varval---assign-varval"><code>-v</code> var=val, <code>--assign</code> var=val</h4>
+<p>Присвоить значение val переменной var перед началом выполнения программы. Такие значения переменных доступны в правиле BEGIN программы AWK.</p>
+<h4 id="-b---characters-as-bytes"><code>-b</code>, <code>--characters-as-bytes</code></h4>
+<p>Обрабатывать все входные данные как однобайтовые символы. Другими словами, не обращать внимания на информацию о локали при попытке обработать строки как многобайтовые символы. Параметр --posix отменяет этот.</p>
+<h4 id="-c---traditional"><code>-c</code>, <code>--traditional</code></h4>
+<p>Работать в режиме совместимости. В режиме совместимости gawk ведёт себя идентично awk Брайана Кернигана; ни одно из расширений, специфичных для GNU, не распознаётся. См. GNU EXTENSIONS ниже.</p>
+<h4 id="-c---copyright"><code>-C</code>, <code>--copyright</code></h4>
+<p>Печатает краткую версию сообщения о авторских правах GNU на стандартный вывод и успешно завершает работу.</p>
+<h4 id="-dfile---dump-variablesfile"><code>-d[file]</code>, <code>--dump-variables[=file]</code></h4>
+<p>Печатает отсортированный список глобальных переменных, их типов и конечных значений в файл. Если файл не указан, gawk использует файл с именем awkvars.out в текущем каталоге.</p>
+<p>Наличие списка всех глобальных переменных - хороший способ поиска опечаток в ваших программах. Вы также используете этот параметр, если у вас есть большая программа с множеством функций, и вы хотите убедиться, что ваши функции не используют глобальные переменные, которые вы имели в виду как локальные. ( Это особенно легко сделать с простыми именами переменных, такими как i, j и т.д. )</p>
+<h4 id="-dfile---debugfile"><code>-D</code>[file], <code>--debug</code>[=file]</h4>
+<p>Включить отладку программ AWK. По умолчанию отладчик читает команды интерактивно с клавиатуры ( стандартный ввод ). Необязательный аргумент файла указывает файл со списком команд, которые отладчик должен выполнить не интерактивно.</p>
+<h4 id="-e-текст-программы---source-текст-программы"><code>-e</code> текст-программы, <code>--source</code> текст-программы</h4>
+<p>Использовать текст-программы в качестве исходного кода программы AWK. Этот параметр позволяет легко смешивать библиотечные функции ( используемые через параметры -f и -i ) с исходным кодом, введённым в командной строке. Он предназначен в первую очередь для средних и больших программ AWK, используемых в оболочках.</p>
+<h4 id="-e-файл---exec-файл"><code>-E</code> файл, <code>--exec</code> файл</h4>
+<p>Похоже на -f, однако этот параметр обрабатывается последним. Это следует использовать с #! скриптами, особенно для CGI приложений, чтобы избежать передачи параметров или исходного кода ( ! ) в командной строке из URL. Этот параметр отключает присвоение переменных командной строки.</p>
+<h4 id="-g---gen-pot"><code>-g</code>, <code>--gen-pot</code></h4>
+<p>Сканировать и анализировать программу AWK и генерировать файл формата GNU .pot ( Portable Object Template ) на стандартный вывод с записями для всех локализуемых строк в программе. Программа сама не выполняется. См. распределение GNU gettext для получения дополнительной информации о .pot файлах.</p>
+<h4 id="-h---help"><code>-h</code>, <code>--help</code></h4>
+<p>Печатает относительно краткое резюме доступных параметров на стандартный вывод. ( Согласно стандартам кодирования GNU, эти параметры вызывают немедленный успешный выход. )</p>
+<h4 id="-i-файл-включения---include-файл-включения"><code>-i</code> файл-включения, <code>--include</code> файл-включения</h4>
+<p>Загружает библиотеку исходного кода awk. Это ищет библиотеку, используя переменную окружения AWKPATH. Если первоначальный поиск не удался, будет сделана ещё одна попытка после добавления суффикса .awk. Файл будет загружен только один раз ( т.е. дубликаты исключаются ), и код не составляет основной исходный код программы.</p>
+<h4 id="-l-lib---load-lib"><code>-l</code> lib, <code>--load</code> lib</h4>
+<p>Загружает расширение gawk из общей библиотеки lib. Это ищет библиотеку, используя переменную окружения AWKLIBPATH. Если первоначальный поиск не удался, будет сделана ещё одна попытка после добавления суффикса общей библиотеки по умолчанию для платформы. Ожидается, что процедура инициализации библиотеки будет называться dl_load().</p>
+<h4 id="-l-значение---lintзначение"><code>-L</code> [значение], <code>--lint</code>[=значение]</h4>
+<p>Предоставляет предупреждения о конструкциях, которые сомнительны или не портируемы в другие реализации AWK. С необязательным аргументом fatal предупреждения lint становятся фатальными ошибками. Это может быть радикально, но его использование, безусловно, побудит разработку более чистых программ AWK. С необязательным аргументом invalid выдаются только предупреждения о действительно недопустимых конструкциях. ( Это ещё не полностью реализовано. )</p>
+<h4 id="-m---bignum"><code>-M</code>, <code>--bignum</code></h4>
+<p>Принудительно использовать произвольную точность арифметики для чисел. Этот параметр не имеет эффекта, если gawk не скомпилирован для использования библиотек GNU MPFR и MP. ( В этом случае gawk выдаёт предупреждение. )</p>
+<h4 id="-n---non-decimal-data"><code>-n</code>, <code>--non-decimal-data</code></h4>
+<p>Признавать восьмеричные и шестнадцатеричные значения во входных данных. Используйте этот параметр с большой осторожностью!</p>
+<h4 id="-n---use-lc-numeric"><code>-N</code>, <code>--use-lc-numeric</code></h4>
+<p>Принудительно заставить gawk использовать символ десятичной точки локали при разборе входных данных. Хотя стандарт POSIX требует этого поведения, и gawk делает это, когда --posix включён, по умолчанию он следует традиционному поведению и использует точку в качестве десятичной точки, даже в локалях, где точка не является символом десятичной точки. Этот параметр отменяет поведение по умолчанию, без полной строгой строгости параметра --posix.</p>
+<h4 id="-oфайл---pretty-printфайл"><code>-o</code>[файл], <code>--pretty-print</code>[=файл]</h4>
+<p>Выводит красиво отформатированную версию программы в файл. Если файл не указан, gawk использует файл с именем awkprof.out в текущем каталоге. Подразумевает --no-optimize.</p>
+<h4 id="-o--optimize"><code>-O</code>,<code>--optimize</code></h4>
+<p>Включает оптимизации по умолчанию gawk для внутреннего представления программы. В настоящее время это включает простое свёртывание констант и устранение хвостовых вызовов для рекурсивных функций. Этот параметр включён по умолчанию.</p>
+<h4 id="-pфайл-профиля---profileфайл-профиля"><code>-p</code>[файл-профиля], <code>--profile</code>[=файл-профиля]</h4>
+<p>Начинает сессию профилирования и отправляет данные профилирования в файл профиля. По умолчанию это awkprof.out. Профиль содержит количество выполнений каждого оператора в программе в левом поле и количество вызовов функций для каждой пользовательской функции. Подразумевает --no-optimize.</p>
+<h4 id="-p---posix"><code>-P</code>, <code>--posix</code></h4>
+<p>Это включает режим совместимости, с следующими дополнительными ограничениями:</p>
+<ul>
+<li>\x escape последовательности не распознаются.</li>
+<li>Вы не можете продолжать строки после ? и :.</li>
+<li>Синоним func для ключевого слова function не распознаётся.</li>
+<li>Операторы ** и **= не могут использоваться вместо ^ и ^=.</li>
+</ul>
+<h4 id="-r---re-interval"><code>-r</code>, <code>--re-interval</code></h4>
+<p>Включает использование интервалов в регулярных выражениях ( см. Регулярные выражения ниже ). Интервальные выражения традиционно не были доступны в языке AWK. Стандарт POSIX добавил их, чтобы сделать awk и egrep согласованными друг с другом. Они включены по умолчанию, но этот параметр остаётся для использования с --traditional.</p>
+<h4 id="-s---no-optimize"><code>-s</code>, <code>--no-optimize</code></h4>
+<p>Отключает оптимизации по умолчанию gawk для внутреннего представления программы.</p>
+<h4 id="-s---sandbox"><code>-S</code>, <code>--sandbox</code></h4>
+<p>Запускает gawk в режиме песочницы, отключая функцию system(), перенаправление ввода с помощью getline, перенаправление вывода с помощью print и printf, и загрузку динамических расширений. Выполнение команд ( через конвейеры ) также отключено. Это эффективно блокирует скрипт от доступа к локальным ресурсам, кроме файлов, указанных в командной строке.</p>
+<h4 id="-t---lint-old"><code>-t</code>, <code>--lint-old</code></h4>
+<p>Предоставляет предупреждения о конструкциях, которые не портируемы в оригинальную версию UNIX awk.</p>
+<h4 id="-v---version"><code>-V</code>, <code>--version</code></h4>
+<p>Печатает информацию о версии для этой конкретной копии gawk на стандартный вывод. Это полезно в основном для того, чтобы знать, актуальна ли текущая копия gawk на вашей системе по сравнению с тем, что распространяет Фонд свободного программного обеспечения. Это также полезно при сообщении об ошибках. ( Согласно стандартам кодирования GNU, эти параметры вызывают немедленный успешный выход. )</p>
+<h4 id="--"><code>--</code></h4>
+<p>Указывает конец параметров. Это полезно, чтобы позволить дальнейшим аргументам программы AWK начинаться с &quot;–&quot;. Это обеспечивает согласованность с конвенцией разбора аргументов, исползуемой большинством других программ POSIX.</p>
+<p>В режиме совместимости любые другие параметры помечаются как недопустимые, но в остальном игнорируются. В нормальной работе, пока текст программы был предоставлен, неизвестные параметры передаются в программу AWK в массиве ARGV для обработки. Это особенно полезно для запуска программ AWK через механизм исполняемого интерпретатора #!.</p>
+<p>Для совместимости с POSIX параметр -W может быть использован с именем длинного параметра.</p>
+<h2 id="выполнение-программ-awk">ВЫПОЛНЕНИЕ ПРОГРАММ AWK</h2>
+<p>Программа AWK состоит из последовательности необязательных директив, операторов-шаблонов и действий, а также необязательных определений функций.</p>
+<pre><code class="language-awk">@include <span class="hljs-string">&quot;имя_файла&quot;</span>
+@load <span class="hljs-string">&quot;имя_файла&quot;</span>
+шаблон   { операторы действий }
+функция имя(список_параметров) { операторы }
+</code></pre>
+<p>Gawk сначала читает исходный код программы из файлов программы, если они указаны, из аргументов к --source или из первого не параметра аргумента в командной строке. Параметры -f и --source могут использоваться несколько раз в командной строке. Gawk читает текст программы так, как если бы все файлы программы и тексты исходного кода командной строки были объединены вместе. Это полезно для создания библиотек функций AWK, не включая их в каждую новую программу AWK, которая их использует. Это также предоставляет возможность смешивать библиотечные функции с программами командной строки.</p>
+<p>Кроме того, строки, начинающиеся с @include, могут использоваться для включения других исходных файлов в вашу программу, что делает использование библиотек ещё проще. Это эквивалентно использованию параметра -i.</p>
+<p>Строки, начинающиеся с @load, могут использоваться для загрузки функций расширения в вашу программу. Это эквивалентно использованию параметра -l.</p>
+<p>Переменная окружения AWKPATH указывает путь поиска, который будет использоваться при поиске исходных файлов, названных с помощью параметров -f и -i. Если эта переменная не существует, путь по умолчанию - &quot;.:/usr/local/share/awk&quot;. ( Фактический каталог может варьироваться в зависимости от того, как gawk был собран и установлен. ) Если имя файла, указанное в параметре -f, содержит символ &quot;/&quot;, поиск по пути не выполняется.</p>
+<p>Переменная окружения AWKLIBPATH указывает путь поиска, который будет использоваться при поиске исходных файлов, названных с помощью параметров -l. Если эта переменная не существует, путь по умолчанию - &quot;/usr/local/lib/gawk&quot;. ( Фактический каталог может варьироваться в зависимости от того, как gawk был собран и установлен. )</p>
+<p>Gawk выполняет программы AWK в следующем порядке. Сначала выполняются все присвоения переменных, указанные через параметр -v. Затем gawk компилирует программу в внутреннюю форму. Затем gawk выполняет код в правилах BEGIN ( если таковые имеются ), а затем начинает читать каждый файл, указанный в массиве ARGV ( до ARGV[ARGC-1] ). Если на командной строке не указано файлов, gawk читает стандартный ввод.</p>
+<p>Если имя файла в командной строке имеет форму var=val, оно обрабатывается как присвоение переменной. Переменной var будет присвоено значение val. ( Это происходит после выполнения любых правил BEGIN. ) Присвоение переменной командной строки наиболее полезно для динамического присвоения значений переменным, которые AWK использует для управления тем, как входные данные разбиваются на поля и записи. Это также полезно для управления состоянием, если требуется несколько проходов по одному и тому же файлу данных.</p>
+<p>Если значение определённого элемента ARGV пусто (&quot;&quot;), gawk пропускает его.</p>
+<p>Для каждого входного файла, если существует правило BEGINFILE, gawk выполняет связанный код перед обработкой содержимого файла. Аналогично, gawk выполняет код, связанный с ENDFILE, после обработки файла.</p>
+<p>Для каждой записи во входных данных gawk проверяет, соответствует ли она любому шаблону в программе AWK. Для каждого шаблона, которому соответствует запись, gawk выполняет связанное действие. Шаблоны проверяются в порядке их появления в программе.</p>
+<p>Наконец, после того как все входные данные исчерпаны, gawk выполняет код в правилах END ( если таковые имеются ).</p>
+<h3 id="командные-строки">Командные строки</h3>
+<p>Согласно POSIX, файлы, указанные в командной строке awk, должны быть текстовыми файлами. Поведение &quot;неопределено&quot;, если это не так. Большинство версий awk рассматривают каталог в командной строке как фатальную ошибку.</p>
+<p>Начиная с версии 4.0 gawk, каталог в командной строке вызывает предупреждение, но в остальном пропускается. Если указан любой из параметров --posix или --traditional, gawk возвращается к тому, чтобы рассматривать каталоги в командной строке как фатальную ошибку.</p>
+<h2 id="переменные-записи-и-поля">ПЕРЕМЕННЫЕ, ЗАПИСИ И ПОЛЯ</h2>
+<p>Переменные AWK динамичны; они появляются, когда их впервые используют. Их значения могут быть либо числами с плавающей запятой, либо строками, либо тем и другим, в зависимости от того, как они используются. Кроме того, gawk позволяет переменным иметь тип регулярного выражения. AWK также имеет одномерные массивы; массивы с несколькими измерениями могут быть смоделированы. Gawk предоставляет истинные массивы массивов; см. Массивы ниже. Несколько предопределённых переменных устанавливаются по мере выполнения программы; они описаны по мере необходимости и кратко изложены ниже.</p>
+<h3 id="записи">Записи</h3>
+<p>Обычно записи разделяются символами новой строки. Вы можете контролировать, как записи разделяются, присваивая значения встроенной переменной RS. Если RS - это любой одиночный символ, этот символ разделяет записи. В противном случае RS - это регулярное выражение. Текст во входных данных, который соответствует этому регулярному выражению, разделяет запись. Однако в режиме совместимости используется только первый символ его строкового значения для разделения записей. Если RS установлен в пустую строку, записи разделяются пустыми строками. Когда RS установлен в пустую строку, символ новой строки всегда действует как разделитель полей, в дополнение к любому значению, которое может иметь FS.</p>
+<h3 id="поля">Поля</h3>
+<p>При чтении каждой входной записи gawk разбивает запись на поля, используя значение переменной FS в качестве разделителя полей. Если FS - это одиночный символ, поля разделяются этим символом. Если FS - это пустая строка, то каждый отдельный символ становится отдельным полем. В противном случае FS ожидается как полное регулярное выражение. В специальном случае, если FS - это один пробел, поля разделяются последовательностями пробелов и/или табуляций и/или новых строк. ПРИМЕЧАНИЕ: Значение IGNORECASE ( см. ниже ) также влияет на то, как поля разбиваются, когда FS является регулярным выражением, и как записи разделяются, когда RS является регулярным выражением.</p>
+<p>Если переменная FIELDWIDTHS установлена в список чисел, разделённых пробелами, каждое поле ожидается с фиксированной шириной, и gawk разбивает запись, используя указанные ширины. Каждая ширина поля может быть предварена значением, разделённым двоеточием, указывающим количество символов, которые нужно пропустить перед началом поля. Значение FS игнорируется. Присвоение нового значения FS или FPAT отменяет использование FIELDWIDTHS.</p>
+<p>Аналогично, если переменная FPAT установлена в строку, представляющую регулярное выражение, каждое поле состоит из текста, который соответствует этому регулярному выражению. В этом случае регулярное выражение описывает сами поля, а не текст, который разделяет поля. Присвоение нового значения FS или FIELDWIDTHS отменяет использование FPAT.</p>
+<p>Каждое поле во входной записи может быть указано по его позиции: $1, $2 и так далее. $0 - это вся запись. Поля не обязательно должны указываться константами:</p>
+<pre><code>    n = 5
+    print $n
+</code></pre>
+<p>печатает пятое поле во входной записи.</p>
+<p>Переменная NF устанавливается в общее количество полей во входной записи.</p>
+<p>Ссылки на несуществующие поля ( т.е. поля после <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>F</mi><mo stretchy="false">)</mo><mtext>создаютпустуюстроку</mtext><mi mathvariant="normal">.</mi><mtext>Однакоприсвоениенесуществующемуполю</mtext><mo stretchy="false">(</mo><mtext>например</mtext><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">NF ) создают пустую строку. Однако присвоение несуществующему полю ( например, </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">NF</span><span class="mclose">)</span><span class="mord cyrillic_fallback">создаютпустуюстроку</span><span class="mord">.</span><span class="mord cyrillic_fallback">Однакоприсвоениенесуществующемуполю</span><span class="mopen">(</span><span class="mord cyrillic_fallback">например</span><span class="mpunct">,</span></span></span></span> ( NF+2 ) = 5 ) увеличивает значение NF, создаёт любые промежуточные поля с пустой строкой в качестве их значений и вызывает пересчёт значения $0, при этом поля разделяются значением OFS. Ссылки на поля с отрицательными номерами вызывают фатальную ошибку. Уменьшение NF приводит к потере значений полей, превышающих новое значение, и к пересчёту значения $0, при этом поля разделяются значением OFS.</p>
+<p>Присвоение значения существующему полю вызывает полное восстановление записи, когда $0 ссылается. Аналогично, присвоение значения $0 вызывает повторное разделение записи, создавая новые значения для полей.</p>
+<h3 id="встроенные-переменные">Встроенные переменные</h3>
+<p>Встроенные переменные gawk:</p>
+<h4 id="argc"><code>ARGC</code></h4>
+<p>Количество аргументов командной строки ( не включает параметры для gawk или исходный код программы ).</p>
+<h4 id="argind"><code>ARGIND</code></h4>
+<p>Индекс в ARGV текущего обрабатываемого файла.</p>
+<h4 id="argv"><code>ARGV</code></h4>
+<p>Массив аргументов командной строки. Массив индексируется от 0 до ARGC - 1. Динамическое изменение содержимого ARGV может контролировать файлы, используемые для данных.</p>
+<h4 id="binmode"><code>BINMODE</code></h4>
+<p>В не-POSIX системах указывает использование &quot;двойного&quot; режима для всех операций ввода-вывода. Числовые значения 1, 2 или 3 указывают, что входные файлы, выходные файлы или все файлы соответственно должны использовать двоичный ввод-вывод. Строковые значения &quot;r&quot; или &quot;w&quot; указывают, что входные файлы или выходные файлы соответственно должны использовать двоичный ввод-вывод. Строковые значения &quot;rw&quot; или &quot;wr&quot; указывают, что все файлы должны использовать двоичный ввод-вывод. Любое другое строковое значение рассматривается как &quot;rw&quot;, но вызывает предупреждение.</p>
+<h4 id="convfmt"><code>CONVFMT</code></h4>
+<p>Формат преобразования для чисел, по умолчанию &quot;%.6g&quot;.</p>
+<h4 id="environ"><code>ENVIRON</code></h4>
+<p>Массив, содержащий значения текущей среды. Массив индексируется по переменным окружения, каждый элемент является значением этой переменной ( например, ENVIRON[&quot;HOME&quot;] может быть &quot;/home/arnold&quot; ).<br/>
+В режиме POSIX изменение этого массива не влияет на среду, видимую программами, которые gawk запускает через перенаправление или функцию system(). В противном случае gawk обновляет свою реальную среду, так что программы, которые он запускает, видят изменения.</p>
+<h4 id="errno"><code>ERRNO</code></h4>
+<p>Если возникает системная ошибка либо при перенаправлении для getline, либо во время чтения для getline, либо при close(), то ERRNO устанавливается в строку, описывающую ошибку. Значение подлежит переводу в неанглийских локалях. Если строка в ERRNO соответствует системной ошибке в переменной errno(3), то числовое значение можно найти в PROCINFO[&quot;errno&quot;]. Для не системных ошибок PROCINFO[&quot;errno&quot;] будет равно нулю.</p>
+<h4 id="fieldwidths"><code>FIELDWIDTHS</code></h4>
+<p>Список ширин полей, разделённых пробелами. Когда установлено, gawk разбивает ввод на поля фиксированной ширины, вместо использования значения переменной FS в качестве разделителя полей. Каждая ширина поля может быть предварена значением, разделённым двоеточием, указывающим количество символов, которые нужно пропустить перед началом поля. См. Поля выше.</p>
+<h4 id="filename"><code>FILENAME</code></h4>
+<p>Имя текущего входного файла. Если файлы не указаны в командной строке, значение FILENAME равно &quot;-&quot;. Однако FILENAME не определён внутри правила BEGIN ( если не установлен с помощью getline ).</p>
+<h4 id="fnr"><code>FNR</code></h4>
+<p>Номер записи ввода в текущем входном файле.</p>
+<h4 id="fpat"><code>FPAT</code></h4>
+<p>Регулярное выражение, описывающее содержимое полей в записи. Когда установлено, gawk разбивает ввод на поля, где поля соответствуют регулярному выражению, вместо использования значения переменной FS в качестве разделителя полей. См. Поля выше.</p>
+<h4 id="fs"><code>FS</code></h4>
+<p>Разделитель полей ввода, по умолчанию пробел. См. Поля выше.</p>
+<h4 id="functab"><code>FUNCTAB</code></h4>
+<p>Массив, индексы и соответствующие значения которого являются именами всех пользовательских или расширенных функций в программе. ПРИМЕЧАНИЕ: Вы не можете использовать оператор delete с массивом FUNCTAB.</p>
+<h4 id="ignorecase"><code>IGNORECASE</code></h4>
+<p>Управляет чувствительностью к регистру всех операций с регулярными выражениями и строками. Если IGNORECASE имеет ненулевое значение, то сравнения строк и сопоставление шаблонов в правилах, разделение полей с FS и FPAT, разделение записей с RS, сопоставление регулярных выражений с ~ и !~, а также встроенные функции gensub(), gsub(), index(), match(), patsplit(), split() и sub() игнорируют регистр при выполнении операций с регулярными выражениями. ПРИМЕЧАНИЕ: Индексация массивов не затрагивается. Однако функции asort() и asorti() затрагиваются.<br>
+Таким образом, если IGNORECASE не равно нулю, /aB/ соответствует всем строкам &quot;ab&quot;, &quot;aB&quot;, &quot;Ab&quot; и &quot;AB&quot;. Как и все переменные AWK, начальное значение IGNORECASE равно нулю, так что все операции с регулярными выражениями и строками обычно чувствительны к регистру.</p>
+<h4 id="lint"><code>LINT</code></h4>
+<p>Обеспечивает динамический контроль параметра --lint изнутри программы AWK. Когда true, gawk печатает предупреждения lint. Когда false, он не печатает. Когда присваивается строковое значение &quot;fatal&quot;, предупреждения lint становятся фатальными ошибками, точно так же, как --lint=fatal. Любое другое истинное значение просто печатает предупреждения.</p>
+<h4 id="nf"><code>NF</code></h4>
+<p>Количество полей в текущей входной записи.</p>
+<h4 id="nr"><code>NR</code></h4>
+<p>Общее количество входных записей, увиденных до сих пор.</p>
+<h4 id="ofmt"><code>OFMT</code></h4>
+<p>Формат вывода для чисел, по умолчанию &quot;%.6g&quot;.</p>
+<h4 id="ofs"><code>OFS</code></h4>
+<p>Разделитель выходных полей, по умолчанию пробел.</p>
+<h4 id="ors"><code>ORS</code></h4>
+<p>Разделитель выходных записей, по умолчанию символ новой строки.</p>
+<h4 id="prec"><code>PREC</code></h4>
+<p>Рабочая точность чисел с произвольной точностью, по умолчанию 53.</p>
+<h4 id="procinfo"><code>PROCINFO</code></h4>
+<p>Элементы этого массива предоставляют доступ к информации о выполняемой программе AWK. На некоторых системах могут быть элементы в массиве &quot;group1&quot; до &quot;groupn&quot; для некоторого n, который является количеством дополнительных групп, к которым принадлежит процесс. Используйте оператор in, чтобы проверить наличие этих элементов. Следующие элементы гарантированно доступны:</p>
+<h5 id="procinfoargv-----аргументы-командной-строки-полученные-gawk-на-уровне-языка-c-индексы-начинаются-с-нуля"><code>PROCINFO</code>[&quot;argv&quot;]     Аргументы командной строки, полученные gawk на уровне языка C. Индексы начинаются с нуля.</h5>
+<h5 id="procinfoegid-----значение-системного-вызова-getegid2"><code>PROCINFO</code>[&quot;egid&quot;]     Значение системного вызова getegid(2).</h5>
+<h5 id="procinfoerrno----значение-errno3-когда-errno-установлено-в-соответствующее-сообщение-об-ошибке"><code>PROCINFO</code>[&quot;errno&quot;]    Значение errno(3), когда ERRNO установлено в соответствующее сообщение об ошибке.</h5>
+<h5 id="procinfoeuid-----значение-системного-вызова-geteuid2"><code>PROCINFO</code>[&quot;euid&quot;]     Значение системного вызова geteuid(2).</h5>
+<h5 id="procinfogid------значение-системного-вызова-getgid2"><code>PROCINFO</code>[&quot;gid&quot;]      Значение системного вызова getgid(2).</h5>
+<h5 id="procinfoidentifiers-подмассив-индексируемый-именами-всех-идентификаторов-используемых-в-тексте-программы-awk"><code>PROCINFO</code>[&quot;identifiers&quot;] Подмассив, индексируемый именами всех идентификаторов, используемых в тексте программы AWK.</h5>
+<p>Значения указывают, что gawk знает об идентификаторах после завершения разбора программы; они не обновляются во время выполнения программы. Для каждого идентификатора значение элемента - одно из следующих:</p>
+<ul>
+<li><code>&quot;array&quot;</code>     Идентификатор является массивом.</li>
+<li><code>&quot;builtin&quot;</code>   Идентификатор является встроенной функцией.</li>
+<li><code>&quot;extension&quot;</code> Идентификатор является функцией расширения, загруженной через @load или -l.</li>
+<li><code>&quot;scalar&quot;</code>    Идентификатор является скалярным.</li>
+<li><code>&quot;untyped&quot;</code>   Идентификатор не имеет типа ( может использоваться как скаляр или массив, gawk пока не знает ).</li>
+<li><code>&quot;user&quot;</code>      Идентификатор является пользовательской функцией.</li>
+</ul>
+<h5 id="procinfopgrpid----идентификатор-группы-процессов-текущего-процесса"><code>PROCINFO</code>[&quot;pgrpid&quot;]    Идентификатор группы процессов текущего процесса.</h5>
+<h5 id="procinfopid-------идентификатор-текущего-процесса"><code>PROCINFO</code>[&quot;pid&quot;]       Идентификатор текущего процесса.</h5>
+<h5 id="procinfoppid------идентификатор-родительского-процесса-текущего-процесса"><code>PROCINFO</code>[&quot;ppid&quot;]      Идентификатор родительского процесса текущего процесса.</h5>
+<h5 id="procinfostrftime--строка-формата-времени-по-умолчанию-для-strftime"><code>PROCINFO</code>[&quot;strftime&quot;]  Строка формата времени по умолчанию для strftime().</h5>
+<h5 id="procinfouid-------значение-системного-вызова-getuid2"><code>PROCINFO</code>[&quot;uid&quot;]       Значение системного вызова getuid(2).</h5>
+<h5 id="значения-следующих-элементов-присутствуют-если-доступна-загрузка-динамических-расширений">Значения следующих элементов присутствуют, если доступна загрузка динамических расширений:</h5>
+<h6 id="procinfoapi_major--основная-версия-api-расширения"><code>PROCINFO</code>[&quot;api_major&quot;]  Основная версия API расширения.</h6>
+<h6 id="procinfoapi_minor--второстепенная-версия-api-расширения"><code>PROCINFO</code>[&quot;api_minor&quot;]  Второстепенная версия API расширения.</h6>
+<h5 id="следующие-элементы-доступны-если-поддержка-mpfr-скомпилирована-в-gawk">Следующие элементы доступны, если поддержка MPFR скомпилирована в gawk:</h5>
+<h6 id="procinfogmp_version--версия-библиотеки-gnu-mp-используемой-для-поддержки-чисел-с-произвольной-точностью-в-gawk"><code>PROCINFO</code>[&quot;gmp_version&quot;]  Версия библиотеки GNU MP, используемой для поддержки чисел с произвольной точностью в gawk.</h6>
+<h6 id="procinfompfr_version--версия-библиотеки-gnu-mpfr-используемой-для-поддержки-чисел-с-произвольной-точностью-в-gawk"><code>PROCINFO</code>[&quot;mpfr_version&quot;]  Версия библиотеки GNU MPFR, используемой для поддержки чисел с произвольной точностью в gawk.</h6>
+<h6 id="procinfoprec_max--максимальная-поддерживаемая-точность-библиотекой-gnu-mpfr-для-чисел-с-произвольной-точностью"><code>PROCINFO</code>[&quot;prec_max&quot;]  Максимальная поддерживаемая точность библиотекой GNU MPFR для чисел с произвольной точностью.</h6>
+<h6 id="procinfoprec_min--минимальная-допустимая-точность-библиотекой-gnu-mpfr-для-чисел-с-произвольной-точностью"><code>PROCINFO</code>[&quot;prec_min&quot;]  Минимальная допустимая точность библиотекой GNU MPFR для чисел с произвольной точностью.</h6>
+<h5 id="следующие-элементы-могут-быть-установлены-программой-для-изменения-поведения-gawk">Следующие элементы могут быть установлены программой для изменения поведения gawk:</h5>
+<h6 id="procinfononfatal--если-это-существует-то-ошибки-ввода-вывода-для-всех-перенаправлений-становятся-нефатальными"><code>PROCINFO</code>[&quot;NONFATAL&quot;]  Если это существует, то ошибки ввода-вывода для всех перенаправлений становятся нефатальными.</h6>
+<h6 id="procinfoame-nonfatal--делает-ошибки-ввода-вывода-для-имени-нефатальными"><code>PROCINFO</code>[&quot;ame&quot;, &quot;NONFATAL&quot;]  Делает ошибки ввода-вывода для имени нефатальными.</h6>
+<h6 id="procinfocommand-pty--использует-псевдотерминал-для-двусторонней-связи-с-командой-вместо-настройки-двух-однонаправленных-труб"><code>PROCINFO</code>[&quot;command&quot;, &quot;pty&quot;]  Использует псевдотерминал для двусторонней связи с командой вместо настройки двух однонаправленных труб.</h6>
+<h6 id="procinfoinput-read_timeout-таймаут-в-миллисекундах-для-чтения-данных-из-ввода"><code>PROCINFO</code>[&quot;input&quot;, &quot;READ_TIMEOUT&quot;] Таймаут в миллисекундах для чтения данных из ввода</h6>
+<p>где input - это строка перенаправления или имя файла. Значение ноль или меньше нуля означает отсутствие таймаута.</p>
+<h6 id="procinfoinput-retry"><code>PROCINFO</code>[&quot;input&quot;, &quot;RETRY&quot;]</h6>
+<p>Если возникает ошибка ввода-вывода, которую можно повторить, при чтении данных из ввода, и этот элемент массива существует, то getline возвращает -2 вместо -1, и дальнейшие вызовы getline могут быть попытаны. Ошибка ввода-вывода, которую можно повторить, - это та, где значение errno(3) равно EAGAIN, EWOULDBLOCK, EINTR или ETIMEDOUT. Это может быть полезно в сочетании с PROCINFO[&quot;input&quot;, &quot;READ_TIMEOUT&quot;] или ситуациями, когда файловый дескриптор настроен на неблокирующее поведение.</p>
+<h6 id="procinfosorted_in"><code>PROCINFO</code>[&quot;sorted_in&quot;]</h6>
+<p>Если этот элемент существует в PROCINFO, то его значение контролирует порядок, в котором элементы массива обходятся в циклах for.<br>
+Поддерживаемые значения: <code>&quot;@ind_str_asc&quot;</code>, <code>&quot;@ind_num_asc&quot;</code>, <code>&quot;@val_type_asc&quot;</code>, <code>&quot;@val_str_asc&quot;</code>, <code>&quot;@val_num_asc&quot;</code>, <code>&quot;@ind_str_desc&quot;</code>, <code>&quot;@ind_num_desc&quot;</code>, <code>&quot;@val_type_desc&quot;</code>, <code>&quot;@val_str_desc&quot;</code>, <code>&quot;@val_num_desc&quot;</code> и <code>&quot;@unsorted&quot;</code>.
+Значение также может быть именем ( в виде строки ) любой функции сравнения, определённой следующим образом:<br></p>
+<pre><code class="language-awk">функция cmp_func(i1, v1, i2, v2) { 
+
+}
+</code></pre>
+<p>где <code>i1</code> и <code>i2</code> - индексы, а <code>v1</code> и <code>v2</code> - соответствующие значения двух сравниваемых элементов.</p>
+<h4 id="roundmode--режим-округления-используемый-для-арифметики-произвольной-точности-для-чисел"><code>ROUNDMODE</code>  Режим округления, используемый для арифметики произвольной точности для чисел</h4>
+<p>Режим округления, используемый для арифметики произвольной точности для чисел, по умолчанию &quot;N&quot; ( IEEE-754 roundTiesToEven режим ). Принятые значения: &quot;N&quot; или &quot;n&quot; для roundTiesToEven, &quot;U&quot; или &quot;u&quot; для roundTowardPositive, &quot;D&quot; или &quot;d&quot; для roundTowardNegative, &quot;Z&quot; или &quot;z&quot; для roundTowardZero, и если ваша версия библиотеки GNU MPFR поддерживает это, &quot;A&quot; или &quot;a&quot; для округления от нуля.</p>
+<h4 id="rs--разделитель-записей-ввода-по-умолчанию-символ-новой-строки"><code>RS</code>  Разделитель записей ввода, по умолчанию символ новой строки.</h4>
+<h4 id="rt--завершитель-записи-gawk-устанавливает-rt-в-текст-ввода-который-соответствует-символу-или-регулярному-выражению-указанному-rs"><code>RT</code>  Завершитель записи. Gawk устанавливает RT в текст ввода, который соответствует символу или регулярному выражению, указанному RS.</h4>
+<h4 id="rstart--индекс-первого-символа-совпавшего-с-match-0-если-совпадения-нет--это-подразумевает-что-индексы-символов-начинаются-с-единицы-"><code>RSTART</code>  Индекс первого символа, совпавшего с match(); 0, если совпадения нет. ( Это подразумевает, что индексы символов начинаются с единицы. )</h4>
+<h4 id="rlength--длина-строки-совпавшей-с-match--1-если-совпадения-нет"><code>RLENGTH</code>  Длина строки, совпавшей с match(); -1, если совпадения нет.</h4>
+<h4 id="subsep--символ-используемый-для-разделения-нескольких-индексов-в-элементах-массива-по-умолчанию-034"><code>SUBSEP</code>  Символ, используемый для разделения нескольких индексов в элементах массива, по умолчанию &quot;\034&quot;.</h4>
+<h4 id="symtab--массив-индексы-которого-являются-именами-всех-текущих-глобальных-переменных-и-массивов-в-программе"><code>SYMTAB</code>  Массив, индексы которого являются именами всех текущих глобальных переменных и массивов в программе.</h4>
+<p>Массив может использоваться для косвенного доступа для чтения или записи значения переменной:</p>
+<pre><code class="language-awk">foo = <span class="hljs-number">5</span>
+SYMTAB[<span class="hljs-string">&quot;foo&quot;</span>] = <span class="hljs-number">4</span>
+print foo    <span class="hljs-comment"># печатает 4</span>
+</code></pre>
+<p>Функция typeof() может использоваться для проверки, является ли элемент в SYMTAB массивом. Вы не можете использовать оператор delete с массивом SYMTAB.</p>
+<h4 id="textdomain--текстовый-домен-программы-awk-используется-для-поиска-локализованных-переводов-строк-программы"><code>TEXTDOMAIN</code>  Текстовый домен программы AWK; используется для поиска локализованных переводов строк программы.</h4>
+<h3 id="массивы">Массивы</h3>
+<p>Массивы индексируются выражением между квадратными скобками ( [ и ] ). Если выражение является списком выражений ( expr, expr ... ), то индекс массива является строкой, состоящей из конкатенации ( строкового ) значения каждого выражения, разделённых значением переменной SUBSEP. Эта возможность используется для моделирования многомерных массивов. Например:</p>
+<pre><code class="language-awk">i = <span class="hljs-string">&quot;A&quot;</span>; j = <span class="hljs-string">&quot;B&quot;</span>; k = <span class="hljs-string">&quot;C&quot;</span>
+x[i, j, k] = <span class="hljs-string">&quot;hello, world\n&quot;</span>
+</code></pre>
+<p>присваивает строку &quot;hello, world\n&quot; элементу массива x, индексируемому строкой &quot;A\034B\034C&quot;. Все массивы в AWK являются ассоциативными, т.е. индексируются строковыми значениями.
+Специальный оператор in может использоваться для проверки, имеет ли массив индекс, состоящий из определённого значения:</p>
+<pre><code class="language-awk"><span class="hljs-keyword">if</span> ( val <span class="hljs-keyword">in</span> array )
+print array[val]
+</code></pre>
+<p>Если массив имеет несколько индексов, используйте ( i, j ) in array.</p>
+<p>Элемент может быть удалён из массива с помощью оператора delete. Оператор delete также может использоваться для удаления всего содержимого массива, просто указав имя массива без индекса.<br>
+gawk поддерживает истинные многомерные массивы. Он не требует, чтобы такие массивы были &quot;прямоугольными&quot;, как в C или C++. Например:</p>
+<pre><code class="language-awk">a[<span class="hljs-number">1</span>] = <span class="hljs-number">5</span>
+a[<span class="hljs-number">2</span>][<span class="hljs-number">1</span>] = <span class="hljs-number">6</span>
+a[<span class="hljs-number">2</span>][<span class="hljs-number">2</span>] = <span class="hljs-number">7</span>
+</code></pre>
+<p><strong>ПРИМЕЧАНИЕ</strong>:<br>
+Вам может потребоваться сообщить gawk, что элемент массива на самом деле является подмассивом, чтобы использовать его там, где gawk ожидает массив ( например, во втором аргументе для split() ). Вы можете сделать это, создав элемент в подмассиве, а затем удалив его с помощью оператора delete.</p>
+<h3 id="типизация-переменных-и-преобразование">Типизация переменных и преобразование</h3>
+<p>Переменные и поля могут быть ( числа с плавающей запятой ) числами, или строками, или тем и другим. Они также могут быть регулярными выражениями. Как значение переменной интерпретируется, зависит от его контекста. Если используется в числовом выражении, оно будет рассматриваться как число; если используется как строка, оно будет рассматриваться как строка.<br>
+Чтобы заставить переменную рассматриваться как число, добавьте к ней ноль; чтобы заставить её рассматриваться как строку, конкатенируйте её с пустой строкой.</p>
+<p>Неинициализированные переменные имеют числовое значение ноль и строковое значение &quot;&quot; ( пустая строка ).</p>
+<p>Когда строка должна быть преобразована в число, преобразование выполняется с использованием strtod(3). Число преобразуется в строку с использованием значения CONVFMT в качестве строки формата для sprintf(3), с числовым значением переменной в качестве аргумента. Однако, хотя все числа в AWK являются числами с плавающей запятой, целые значения всегда преобразуются как целые. Таким образом, учитывая</p>
+<pre><code class="language-awk">CONVFMT = <span class="hljs-string">&quot;%2.2f&quot;</span>
+a = <span class="hljs-number">12</span>
+b = a <span class="hljs-string">&quot;&quot;</span>
+</code></pre>
+<p>переменная b имеет строковое значение &quot;12&quot;, а не &quot;12.00&quot;.</p>
+<p><strong>ПРИМЕЧАНИЕ</strong>:<br>
+При работе в режиме POSIX ( например, с параметром --posix ) будьте осторожны, что настройки локали могут повлиять на то, как обрабатываются десятичные числа: десятичный разделитель чисел, которые вы передаёте gawk, должен соответствовать тому, что ваша локаль ожидает, будь то запятая ( , ) или точка ( . ).</p>
+<p>Gawk выполняет сравнения следующим образом: Если две переменные числовые, они сравниваются численно. Если одно значение числовое, а другое имеет строковое значение, которое является &quot;числовой строкой&quot;, то сравнения также выполняются численно. В противном случае числовое значение преобразуется в строку, и выполняется строковое сравнение. Две строки сравниваются, конечно, как строки.</p>
+<p><strong>Обратите внимание</strong>:<br>
+Обратите внимание, что строковые константы, такие как &quot;57&quot;, не являются числовыми строками, они являются строковыми константами. Идея &quot;числовой строки&quot; применяется только к полям, вводу getline, FILENAME, элементам ARGV, элементам ENVIRON и элементам массива, созданного с помощью split() или patsplit(), которые являются числовыми строками. Основная идея заключается в том, что ввод пользователя, и только ввод пользователя, который выглядит числовым, должен рассматриваться таким образом.</p>
+<h3 id="восьмеричные-и-шестнадцатеричные-константы">Восьмеричные и шестнадцатеричные константы</h3>
+<p>Вы можете использовать константы в восьмеричной и шестнадцатеричной системах в исходном коде вашей программы AWK. Например, восьмеричное значение 011 равно десятичному 9, а шестнадцатеричное значение 0x11 равно десятичному 17.</p>
+<h3 id="строковые-константы">Строковые константы</h3>
+<p>Строковые константы в AWK - это последовательности символов, заключённые в двойные кавычки ( например, &quot;значение&quot; ). Внутри строк распознаются определённые escape-последовательности, как в C. Это:</p>
+<ul>
+<li><code>\\</code>   Литерал обратной косой черты.</li>
+<li><code>\a</code>   Символ &quot;оповещения&quot;; обычно это символ ASCII BEL.</li>
+<li><code>\b</code>   Возврат каретки.</li>
+<li><code>\f</code>   Перенос страницы.</li>
+<li><code>\n</code>   Символ новой строки.</li>
+<li><code>\r</code>   Возврат каретки.</li>
+<li><code>\t</code>   Горизонтальная табуляция.</li>
+<li><code>\v</code>   Вертикальная табуляция.</li>
+<li><code>\xhex цифры</code> Символ, представленный строкой шестнадцатеричных цифр, следующих за <code>\x</code>. До двух следующих шестнадцатеричных цифр считаются частью <em>escape-последовательности</em>. Например, <code>&quot;\x1B&quot;</code> - это символ ASCII <code>ESC</code> ( <em>escape</em> ).</li>
+<li><code>\ddd</code> Символ, представленный последовательностью из 1, 2 или 3 цифр восьмеричной системы. Например, <code>&quot;\033&quot;</code> - это символ ASCII ESC ( <em>escape</em> ).</li>
+<li><code>\c</code>   Литерал символа <code>c</code>.</li>
+</ul>
+<p>В режиме совместимости символы, представленные восьмеричными и шестнадцатеричными <em>escape-последовательностями</em>, обрабатываются буквально, когда используются в константах регулярных выражений. Таким образом, <code>/a\52b/</code> эквивалентно <code>/a\*b/</code>.</p>
+<h3 id="константы-регулярных-выражений">Константы регулярных выражений</h3>
+<p>Константа регулярного выражения - это последовательность символов, заключённая между косыми чертами ( например, <code>/значение/</code> ). Регулярные выражения описаны более подробно ниже; см. <a href="#%D1%80%D0%B5%D0%B3%D1%83%D0%BB%D1%8F%D1%80%D0%BD%D1%8B%D0%B5-%D0%B2%D1%8B%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F">Регулярные выражения</a>.</p>
+<p>Описанные ранее <em>escape-последовательности</em> также могут использоваться внутри констант регулярных выражений ( например, <code>/[ \t\f\n\r\v]/</code> соответствует пробельным символам ).</p>
+<p>Gawk предоставляет строго типизированные константы регулярных выражений. Они записываются с ведущим символом <code>@</code> ( например, <code>@/значение/</code> ). Такие константы могут быть присвоены скалярам ( переменным, элементам массива ) и переданы в пользовательские функции. Переменные, которые были так присвоены, имеют тип регулярного выражения.</p>
+<h2 id="шаблоны-и-действия">ШАБЛОНЫ И ДЕЙСТВИЯ</h2>
+<p>AWK - это язык, ориентированный на строки. Шаблон идёт первым, а затем действие. Операторы действий заключены в <code>{</code> и <code>}</code>. Либо шаблон может отсутствовать, либо действие может отсутствовать, но, конечно, не оба. Если шаблон отсутствует, действие выполняется для каждой записи ввода. Отсутствующее действие эквивалентно</p>
+<pre><code class="language-awk">{ print }
+</code></pre>
+<p>что печатает всю запись.</p>
+<p>Комментарии начинаются с символа <code>#</code> и продолжаются до конца строки. Пустые строки могут использоваться для разделения операторов. Обычно оператор заканчивается символом новой строки, однако это не так для строк, заканчивающихся запятой, <code>{</code>, <code>?</code>, <code>:</code>, <code>&amp;&amp;</code> или <code>||</code>. Строки, заканчивающиеся <code>do</code> или <code>else</code>, также автоматически продолжают свои операторы на следующей строке. В других случаях строку можно продолжить, закончив её символом <code>&quot;\&quot;</code>, в этом случае символ новой строки игнорируется.</p>
+<p>Несколько операторов могут быть помещены в одну строку, разделяя их символом <code>;</code>. Это относится как к операторам внутри части действия пары шаблон-действие ( обычный случай ), так и к операторам шаблонов-действий сами по себе.</p>
+<h3 id="шаблоны">Шаблоны</h3>
+<p>Шаблоны AWK могут быть одним из следующих:</p>
+<ul>
+<li><code>BEGIN</code></li>
+<li><code>END</code></li>
+<li><code>BEGINFILE</code></li>
+<li><code>ENDFILE</code></li>
+<li><code>/регулярное выражение/</code></li>
+<li><code>реляционное выражение</code></li>
+<li><code>шаблон</code> <code>&amp;&amp;</code> <code>шаблон</code></li>
+<li><code>шаблон</code> <code>||</code> <code>шаблон</code></li>
+<li><code>шаблон</code> <code>?</code> <code>шаблон</code> <code>:</code> <code>шаблон</code></li>
+<li><code>( шаблон )</code></li>
+<li><code>! шаблон</code></li>
+<li><code>шаблон1, шаблон2</code></li>
+</ul>
+<p><code>BEGIN</code> и <code>END</code> - это два специальных типа шаблонов, которые не проверяются на входные данные. Операторы действий всех шаблонов <code>BEGIN</code> объединяются так, как если бы все операторы были написаны в одном правиле <code>BEGIN</code>. Они выполняются до того, как будут прочитаны любые входные данные. Аналогично, все правила <code>END</code> объединяются и выполняются, когда все входные данные исчерпаны ( или когда выполняется оператор exit ). Шаблоны <code>BEGIN</code> и <code>END</code> не могут комбинироваться с другими шаблонами в выражениях шаблонов. Шаблоны <code>BEGIN</code> и <code>END</code> не могут иметь отсутствующие части действия.</p>
+<p>Шаблоны <code>BEGINFILE</code> и <code>ENDFILE</code> - это дополнительные специальные шаблоны, тела которых выполняются перед чтением первой записи каждого входного файла командной строки и после чтения последней записи каждого файла. Внутри правила <code>BEGINFILE</code> значение <code>ERRNO</code> является пустой строкой, если файл был успешно открыт. В противном случае возникает проблема с файлом, и код должен использовать <code>nextfile</code>, чтобы пропустить его. Если этого не сделать, gawk выдаёт свою обычную фатальную ошибку для файлов, которые не могут быть открыты.</p>
+<p>Для шаблонов <code>/регулярное выражение/</code> связанный оператор выполняется для каждой записи ввода, которая соответствует регулярному выражению. Регулярные выражения такие же, как в egrep(1), и кратко изложены ниже.</p>
+<p><code>Реляционное выражение</code> может использовать любой из операторов, определённых ниже в разделе действий. Эти операторы обычно проверяют, соответствуют ли определённые поля определённым регулярным выражениям.</p>
+<p>Операторы <code>&amp;&amp;</code>, <code>||</code> и <code>!</code> являются логическими <code>И</code>, <code>ИЛИ</code> и <code>НЕ</code> соответственно, как в C. Они выполняют короткое замыкание, также как в C, и используются для объединения более примитивных выражений шаблонов. Как и в большинстве языков, скобки могут использоваться для изменения порядка выполнения.</p>
+<p>Форма выражения <code>шаблон1, шаблон2</code> называется диапазонным шаблоном. Он соответствует всем записям ввода, начиная с записи, которая соответствует <code>шаблон1</code>, и продолжается до записи, которая соответствует <code>шаблон2</code>, включая её. Он не комбинируется с другими видами выражений шаблонов.</p>
+<h3 id="регулярные-выражения">Регулярные выражения</h3>
+<p><em>Регулярные выражения</em> являются расширенными, продвинутыми, как в egrep. Они состоят из символов, как показано ниже:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>c</code></strong></td>
+<td>Соответствует не-мета-символу c.</td>
+</tr>
+<tr>
+<td><strong><code>\c</code></strong></td>
+<td>Соответствует литералу символа c.</td>
+</tr>
+<tr>
+<td><strong><code>.</code></strong></td>
+<td>Соответствует любому символу, включая новую строку.</td>
+</tr>
+<tr>
+<td><strong><code>^</code></strong></td>
+<td>Соответствует началу строки.</td>
+</tr>
+<tr>
+<td><strong><code>$</code></strong></td>
+<td>Соответствует концу строки.</td>
+</tr>
+<tr>
+<td><strong><code>[abc...]</code></strong></td>
+<td>Список символов: соответствует любому из символов abc.... Вы можете включить диапазон символов, разделив их дефисом.</td>
+</tr>
+<tr>
+<td><strong><code>[^abc...]</code></strong></td>
+<td>Отрицательный список символов: соответствует любому символу, кроме abc....</td>
+</tr>
+<tr>
+<td><strong><code>r1|r2</code></strong></td>
+<td>Альтернация: соответствует либо r1, либо r2.</td>
+</tr>
+<tr>
+<td><strong><code>r1r2</code></strong></td>
+<td>Конкатенация: соответствует r1, а затем r2.</td>
+</tr>
+<tr>
+<td><strong><code>r+</code></strong></td>
+<td>Соответствует одному или более r.</td>
+</tr>
+<tr>
+<td><strong><code>r*</code></strong></td>
+<td>Соответствует нулю или более r.</td>
+</tr>
+<tr>
+<td><strong><code>r?</code></strong></td>
+<td>Соответствует нулю или одному r.</td>
+</tr>
+<tr>
+<td><strong><code>( r )</code></strong></td>
+<td>Группировка: соответствует r.</td>
+</tr>
+<tr>
+<td><strong><code>r{n}</code></strong></td>
+<td></td>
+</tr>
+<tr>
+<td><strong><code>r{n,}</code></strong></td>
+<td></td>
+</tr>
+<tr>
+<td><strong><code>r{n,m}</code></strong></td>
+<td>Одно или два числа внутри фигурных скобок обозначают интервал. Если в фигурных скобках одно число, предшествующее регулярному выражению r повторяется n раз. Если в фигурных скобках два числа, разделённых запятой, r повторяется от n до m раз. Если одно число, за которым следует запятая, то r повторяется как минимум n раз.</td>
+</tr>
+<tr>
+<td><strong><code>\y</code></strong></td>
+<td>Соответствует пустой строке в начале или в конце слова.</td>
+</tr>
+<tr>
+<td><strong><code>\B</code></strong></td>
+<td>Соответствует пустой строке внутри слова.</td>
+</tr>
+<tr>
+<td><strong><code>\&lt;</code></strong></td>
+<td>Соответствует пустой строке в начале слова.</td>
+</tr>
+<tr>
+<td><strong><code>\&gt;</code></strong></td>
+<td>Соответствует пустой строке в конце слова.</td>
+</tr>
+<tr>
+<td><strong><code>\s</code></strong></td>
+<td>Соответствует любому пробельному символу.</td>
+</tr>
+<tr>
+<td><strong><code>\S</code></strong></td>
+<td>Соответствует любому непробельному символу.</td>
+</tr>
+<tr>
+<td><strong><code>\w</code></strong></td>
+<td>Соответствует любому символу, составляющему слово ( буква, цифра или подчёркивание ).</td>
+</tr>
+<tr>
+<td><strong><code>\W</code></strong></td>
+<td>Соответствует любому символу, который не является составляющим слово.</td>
+</tr>
+<tr>
+<td><strong><code>\</code></strong></td>
+<td>Соответствует пустой строке в начале буфера ( строки ).</td>
+</tr>
+<tr>
+<td><strong><code>\'</code></strong></td>
+<td>Соответствует пустой строке в конце буфера.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="escape-последовательности-escape-sequences">Escape-последовательности (Escape Sequences)</h4>
+<p><em>Escape-последовательности</em> - это последовательности символов, которые действительны в строковых константах ( см. <a href="#%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%BE%D0%B2%D1%8B%D0%B5-%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D0%B0%D0%BD%D1%82%D1%8B">Строковые константы</a> ), также действительны в регулярных выражениях.</p>
+<h4 id="классы-символов-character-classes">Классы символов (Character Classes)</h4>
+<p><em>Класс символов</em> - это функция, введённая в стандарт POSIX. Класс символов - это специальная нотация для описания списков символов, которые имеют определённый атрибут, но фактические символы могут варьироваться от страны к стране и/или от набора символов к набору символов. Например, понятие алфавитного символа отличается в США и во Франции.</p>
+<p><em>Класс символов</em> действителен только в регулярном выражении внутри квадратных скобок списка символов. Классы символов состоят из <code>[:</code>, ключевого слова, обозначающего класс, и <code>:]</code>. Классы символов, определённые стандартом POSIX:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>[:alnum:]</code></td>
+<td>Алфавитно-цифровые символы.</td>
+</tr>
+<tr>
+<td><code>[:alpha:]</code></td>
+<td>Алфавитные символы.</td>
+</tr>
+<tr>
+<td><code>[:blank:]</code></td>
+<td>Пробельные или табуляционные символы.</td>
+</tr>
+<tr>
+<td><code>[:cntrl:]</code></td>
+<td>Управляющие символы.</td>
+</tr>
+<tr>
+<td><code>[:digit:]</code></td>
+<td>Числовые символы.</td>
+</tr>
+<tr>
+<td><code>[:graph:]</code></td>
+<td>Символы, которые являются как печатными, так и видимыми. ( Пробел печатный, но не видимый, в то время как &quot;a&quot; является и тем, и другим. )</td>
+</tr>
+<tr>
+<td><code>[:lower:]</code></td>
+<td>Символы алфавита в нижнем регистре.</td>
+</tr>
+<tr>
+<td><code>[:print:]</code></td>
+<td>Печатные символы ( символы, которые не являются управляющими символами ).</td>
+</tr>
+<tr>
+<td><code>[:punct:]</code></td>
+<td>Символы пунктуации ( символы, которые не являются буквами, цифрами, управляющими символами или пробельными символами ).</td>
+</tr>
+<tr>
+<td><code>[:space:]</code></td>
+<td>Пробельные символы ( такие как пробел, табуляция и перенос страницы, чтобы назвать несколько ).</td>
+</tr>
+<tr>
+<td><code>[:upper:]</code></td>
+<td>Символы алфавита в верхнем регистре.</td>
+</tr>
+<tr>
+<td><code>[:xdigit:]</code></td>
+<td>Символы, которые являются шестнадцатеричными цифрами.</td>
+</tr>
+</tbody>
+</table>
+<p>Например, до стандарта POSIX, чтобы соответствовать алфавитно-цифровым символам, вам нужно было бы написать <code>/[A-Za-z0-9]/</code>. Если ваш набор символов имел другие алфавитные символы, это не соответствовало бы им, и если ваш набор символов сортировался иначе, чем ASCII, это могло бы даже не соответствовать ASCII алфавитно-цифровым символам. С классами символов POSIX вы можете написать <code>/[:alnum:]/</code>, и это соответствует алфавитным и числовым символам в вашем наборе символов, независимо от того, какой он.</p>
+<p>Две дополнительные специальные последовательности могут появляться в списках символов. Они применяются к не-ASCII наборам символов, которые могут иметь отдельные символы ( называемые элементами сортировки ), которые представлены более чем одним символом, а также нескольким символам, которые эквивалентны для сортировки. ( Например, во французском языке обычная <code>&quot;e&quot;</code> и <code>&quot;e&quot;</code> с акцентом являются эквивалентными. )</p>
+<h4 id="символ-сортировки-collating-symbols">Символ сортировки (Collating Symbols)</h4>
+<p><em>Символ сортировки</em> - это многосимвольный элемент сортировки, заключённый в <code>[.</code> и <code>.]</code>. Например, если <code>ch</code> - это элемент сортировки, то <code>[[.ch.]]</code> - это регулярное выражение, которое соответствует этому элементу сортировки, в то время как <code>[ch]</code> - это регулярное выражение, которое соответствует либо <code>c</code>, либо <code>h</code>.</p>
+<h4 id="класс-эквивалентности-equivalence-classes">Класс эквивалентности (Equivalence Classes)</h4>
+<p><em>Класс эквивалентности</em> - это специфичное для локали имя для списка символов, которые эквивалентны. Имя заключено в <code>[=</code> и <code>=]</code>. Например, имя <code>e</code> может использоваться для представления всех <code>&quot;e&quot;</code>, <code>&quot;´&quot;</code> и <code>&quot;``&quot;. В этом случае </code>[[=e=]]<code>- это регулярное выражение, которое соответствует любому из</code>e<code>, </code>´<code>или</code>&quot;``&quot;.</p>
+<p>Эти функции очень ценны в неанглоязычных локалях. Библиотечные функции, которые gawk использует для сопоставления регулярных выражений, в настоящее время распознают только классы символов POSIX; они не распознают символы сортировки или классы эквивалентности.</p>
+<p>Операторы <code>\y</code>, <code>\B</code>, <code>\&lt;</code>, <code>\&gt;</code>, <code>\s</code>, <code>\S</code>, <code>\w</code>, <code>\W</code>, <code>\</code>, и <code>\'</code> являются специфичными для gawk; они являются расширениями, основанными на возможностях в библиотеках GNU регулярных выражений.</p>
+<p>Различные параметры командной строки контролируют, как gawk интерпретирует символы в регулярных выражениях.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>без параметров</em></td>
+<td>В случае по умолчанию gawk предоставляет все возможности POSIX регулярных выражений и операторы GNU регулярных выражений, описанные выше.</td>
+</tr>
+<tr>
+<td><code>--posix</code></td>
+<td>Поддерживаются только POSIX регулярные выражения, операторы GNU не являются специальными. ( Например, \w соответствует литералу w ).</td>
+</tr>
+<tr>
+<td><code>--traditional</code></td>
+<td>Сопоставляются традиционные регулярные выражения UNIX awk. Операторы GNU не являются специальными, и интервальные выражения недоступны. Символы, описанные восьмеричными и шестнадцатеричными escape-последовательностями, обрабатываются буквально, даже если они представляют собой метасимволы регулярных выражений.</td>
+</tr>
+<tr>
+<td><code>--re-interval</code></td>
+<td>Разрешает интервальные выражения в регулярных выражениях, даже если <code>--traditional</code> был предоставлен.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="действия-actions">Действия (Actions)</h3>
+<p>Операторы действий заключены в фигурные скобки, <code>{</code> и <code>}</code>. Операторы действий состоят из обычных операторов присвоения, условных и циклических операторов, найденных в большинстве языков. Операторы, управляющие операторами ввода/вывода, и операторы, доступные в AWK, основаны на тех, что в C.</p>
+<h3 id="операторы-operators">Операторы (Operators)</h3>
+<p>Операторы в AWK, в порядке убывания приоритета, следующие:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>( ... )</code></td>
+<td>Группировка</td>
+</tr>
+<tr>
+<td><code>$</code></td>
+<td>Ссылка на поле.</td>
+</tr>
+<tr>
+<td><code>++</code> <code>--</code></td>
+<td>Инкремент и декремент, как префиксные, так и постфиксные.</td>
+</tr>
+<tr>
+<td><code>^</code></td>
+<td>Возведение в степень ( ** также может использоваться, и **= для оператора присвоения ).</td>
+</tr>
+<tr>
+<td><code>+</code> <code>-</code> <code>!</code></td>
+<td>Унарный плюс, унарный минус и логическое отрицание.</td>
+</tr>
+<tr>
+<td><code>*</code> <code>/</code> <code>%</code></td>
+<td>Умножение, деление и остаток.</td>
+</tr>
+<tr>
+<td><code>+</code> <code>-</code></td>
+<td>Сложение и вычитание.</td>
+</tr>
+<tr>
+<td><code>space</code></td>
+<td>Конкатенация строк.</td>
+</tr>
+<tr>
+<td><code>&amp;</code></td>
+<td>Проводной ввод-вывод для getline, print и printf.</td>
+</tr>
+<tr>
+<td><code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code> <code>==</code> <code>!=</code></td>
+<td>Обычные реляционные операторы.</td>
+</tr>
+<tr>
+<td><code>~</code> <code>!~</code></td>
+<td>Сопоставление регулярных выражений, отрицательное сопоставление. ПРИМЕЧАНИЕ: Не используйте постоянное регулярное выражение ( /foo/ ) на левой стороне ~ или !~. Используйте только одно справа. Выражение /foo/ ~ exp имеет то же значение, что и ( ( $0 ~ /foo/ ) ~ exp ). Обычно это не то, что вы хотите.</td>
+</tr>
+<tr>
+<td><code>&amp;&amp;</code></td>
+<td>Логическое И.</td>
+</tr>
+<tr>
+<td><code>||</code></td>
+<td>Логическое ИЛИ.</td>
+</tr>
+<tr>
+<td><code>in</code></td>
+<td>Членство в массиве.</td>
+</tr>
+<tr>
+<td><code>?:</code></td>
+<td>Условное выражение C. Оно имеет форму <strong><code>expr1</code> <code>?</code> <code>expr2</code> <code>:</code> <code>expr3</code></strong>. Если <code>expr1</code> истинно, значение выражения равно <code>expr2</code>, в противном случае - <code>expr3</code>.<br> <strong>Вычисляется только одно значение:</strong> <code>expr2</code> или <code>expr3</code>.</td>
+</tr>
+<tr>
+<td><code>=</code> <code>+=</code> <code>-=</code> <code>*=</code> <code>/=</code> <code>%=</code> <code>^=</code></td>
+<td>Присвоение. Поддерживаются как абсолютное присвоение ( var = value ), так и оператор-присвоение ( другие формы ).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="управляющие-конструкции-control-statements">Управляющие конструкции (Control Statements)</h3>
+<p>Управляющие конструкции следующие:</p>
+<ul>
+<li><strong><code>if</code></strong> <strong><code>(</code></strong> условие <strong><code>)</code></strong> оператор <strong><code>[</code></strong> <strong><code>else</code></strong> оператор <strong><code>]</code></strong></li>
+<li><strong><code>while</code></strong> <strong><code>(</code></strong> условие <strong><code>)</code></strong> оператор</li>
+<li><strong><code>do</code></strong> оператор <strong><code>while</code></strong> <strong><code>(</code></strong> условие <strong><code>)</code></strong></li>
+<li><strong><code>for</code></strong> <strong><code>(</code></strong> expr1; expr2; expr3 <strong><code>)</code></strong> оператор</li>
+<li><strong><code>for</code></strong> <strong><code>(</code></strong> var <strong><code>in</code></strong> array <strong><code>)</code></strong> оператор</li>
+<li><strong><code>break</code></strong></li>
+<li><strong><code>continue</code></strong></li>
+<li><strong><code>delete</code></strong> array<code>[</code>index<code>]</code></li>
+<li><strong><code>delete</code></strong> array</li>
+<li><strong><code>exit</code></strong> <code>[</code> выражение <code>]</code></li>
+<li><strong><code>{</code></strong> операторы <strong><code>}</code></strong></li>
+<li><strong><code>switch</code></strong></li>
+</ul>
+<pre><code class="language-awk">switch ( выражение ) {
+    case значение|regex : оператор
+    ...
+   [ default: оператор ]  
+}
+</code></pre>
+<h3 id="операторы-вводавывода-io-statements">Операторы ввода/вывода (I/O Statements)</h3>
+<p>Операторы ввода/вывода следующие:</p>
+<table>
+<thead>
+<tr>
+<th>Оператор</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>close( файл [, как] )</code></td>
+<td>Закрывает файл, трубу или сопроцесс. Необязательный как должен использоваться только при закрытии одного конца двухсторонней трубы к сопроцессу. Это должно быть строковым значением, либо &quot;to&quot;, либо &quot;from&quot;.</td>
+</tr>
+<tr>
+<td><code>getline</code></td>
+<td>Устанавливает <code>$0</code> из следующей записи ввода; устанавливает NF, NR, FNR, RT.</td>
+</tr>
+<tr>
+<td><code>getline &lt; файл</code></td>
+<td>Устанавливает <code>$0</code> из следующей записи файла; устанавливает NF, RT.</td>
+</tr>
+<tr>
+<td><code>getline var</code></td>
+<td>Устанавливает var из следующей записи ввода; устанавливает NR, FNR, RT.</td>
+</tr>
+<tr>
+<td><code>getline var &lt; файл</code></td>
+<td>Устанавливает var из следующей записи файла, RT.</td>
+</tr>
+<tr>
+<td><code>команда | getline [var]</code></td>
+<td>Выполняет команду, перенаправляя вывод либо в $0, либо в var, как указано выше, и RT.</td>
+</tr>
+<tr>
+<td><code>команда |&amp; getline [var]</code></td>
+<td>Выполняет команду как сопроцесс, перенаправляя вывод либо в $0, либо в var, как указано выше, и RT. Сопроцессы являются расширением gawk. ( команда также может быть сокетом. См. подраздел Специальные имена файлов ниже. )</td>
+</tr>
+<tr>
+<td><code>next</code></td>
+<td>Останавливает обработку текущей записи ввода. Следующая запись ввода читается, и обработка начинается заново с первого шаблона в программе AWK. После достижения конца входных данных gawk выполняет любые правила END.</td>
+</tr>
+<tr>
+<td><code>nextfile</code></td>
+<td>Останавливает обработку текущего входного файла. Следующая запись, которую читают, поступает из следующего входного файла. ИМЯ_ФАЙЛА и ARGIND обновляются, FNR сбрасывается на 1, и обработка начинается заново с первого шаблона в программе AWK. После достижения конца входных данных gawk выполняет любые правила ENDFILE и END.</td>
+</tr>
+<tr>
+<td><code>print</code></td>
+<td>Печатает текущую запись. Выходная запись завершается значением ORS.</td>
+</tr>
+<tr>
+<td><code>print expr-list</code></td>
+<td>Печатает выражения. Каждое выражение разделяется значением OFS. Выходная запись завершается значением ORS.</td>
+</tr>
+<tr>
+<td><code>print expr-list &gt; файл</code></td>
+<td>Печатает выражения в файл. Каждое выражение разделяется значением OFS. Выходная запись завершается значением ORS.</td>
+</tr>
+<tr>
+<td><code>printf fmt, expr-list</code></td>
+<td>Форматирует и печатает. См. Оператор printf ниже.</td>
+</tr>
+<tr>
+<td><span style='white-space: nowrap;'><code>printf fmt, expr-list &gt; файл</code></span></td>
+<td>Форматирует и печатает в файл.</td>
+</tr>
+<tr>
+<td><code>system( cmd-line )</code></td>
+<td>Выполняет команду cmd-line и возвращает код завершения. ( Это может быть недоступно на не-POSIX системах. ) См. GAWK: Эффективное программирование на AWK для получения полных деталей о коде завершения.</td>
+</tr>
+<tr>
+<td><code>fflush( [файл] )</code></td>
+<td>Очищает любые буферы, связанные с открытым выходным файлом или файлом трубы. Если файл отсутствует или является пустой строкой, то очищаются все открытые выходные файлы и трубы.</td>
+</tr>
+</tbody>
+</table>
+<p>Дополнительные перенаправления вывода разрешены для print и printf.</p>
+<pre><code class="language-awk">print ... &gt;&gt; файл
+</code></pre>
+<p>Добавляет вывод в файл.</p>
+<pre><code class="language-awk">print ... | команда
+</code></pre>
+<p>Записывает в трубу.</p>
+<pre><code class="language-awk">print ... |&amp; команда
+</code></pre>
+<p>Отправляет данные в сопроцесс или сокет. ( См. также подраздел Специальные имена файлов ниже. )</p>
+<p>Команда <code>getline</code> возвращает <code>1</code> при успешном выполнении, <code>0</code> — при достижении конца файла и <code>-1</code> — в случае ошибки. Если значение <code>errno(3)</code> указывает, что операцию ввода-вывода можно повторить, и установлен элемент массива <code>PROCINFO[&quot;input&quot;, &quot;RETRY&quot;]</code>, то возвращается <code>-2</code> вместо <code>-1</code>, и можно попытаться вызвать <code>getline</code> снова. В случае ошибки переменная <code>ERRNO</code> устанавливается в строку с описанием проблемы.</p>
+<p><strong>ПРИМЕЧАНИЕ:</strong> Ошибка при открытии двухстороннего сокета приводит к тому, что возвращается нефатальная ошибка в вызывающую функцию. Если вы используете трубу, сопроцесс или сокет для getline, или из print или printf в цикле, вы должны использовать close(), чтобы создать новые экземпляры команды или сокета. AWK не закрывает автоматически трубы, сокеты или сопроцессы, когда они возвращают EOF.</p>
+<h3 id="оператор-printf">Оператор printf</h3>
+<p>AWK версии оператора <code>printf</code> и функции <code>sprintf()</code> (см. ниже) принимают следующие форматы спецификации преобразования:</p>
+<table>
+<thead>
+<tr>
+<th>Спецификатор</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>%c</code></td>
+<td>Один символ. Если аргумент, используемый для %c, является числовым, он обрабатывается как символ и печатается. В противном случае аргумент предполагается как строка, и печатается только первый символ этой строки.</td>
+</tr>
+<tr>
+<td><code>%d, %i</code></td>
+<td>Десятичное число (целая часть).</td>
+</tr>
+<tr>
+<td><code>%e, %E</code></td>
+<td>Число с плавающей запятой в форме [-]d.dddddde[+-]dd. Формат <code>%E</code> использует <code>E</code> вместо <code>e</code>.</td>
+</tr>
+<tr>
+<td><code>%f, %F</code></td>
+<td>Число с плавающей запятой в форме [-]ddd.dddddd. Если системная библиотека поддерживает это, <code>%F</code> также доступен. Это похоже на <code>%f</code>, но использует заглавные буквы для специальных значений &quot;не число&quot; и &quot;бесконечность&quot;. Если <code>%F</code> недоступен, gawk использует <code>%f</code>.</td>
+</tr>
+<tr>
+<td><code>%g, %G</code></td>
+<td>Используйте <code>%e</code> или <code>%f</code> преобразование, в зависимости от того, что короче, с подавлением незначащих нулей. Формат <code>%G</code> использует <code>%E</code> вместо <code>%e</code>.</td>
+</tr>
+<tr>
+<td><code>%o</code></td>
+<td>Беззнаковое восьмеричное число (также целое).</td>
+</tr>
+<tr>
+<td><code>%u</code></td>
+<td>Беззнаковое десятичное число (снова целое).</td>
+</tr>
+<tr>
+<td><code>%s</code></td>
+<td>Строка символов.</td>
+</tr>
+<tr>
+<td><code>%x, %X</code></td>
+<td>Беззнаковое шестнадцатеричное число (целое). Формат %X использует ABCDEF вместо abcdef.</td>
+</tr>
+<tr>
+<td><code>%%</code></td>
+<td>Один символ %; никакой аргумент не преобразуется.</td>
+</tr>
+</tbody>
+</table>
+<p>Необязательные дополнительные параметры могут находиться между % и управляющей буквой:</p>
+<table>
+<thead>
+<tr>
+<th>Параметр</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>count$</code></td>
+<td>Используйте count-й аргумент в этой точке в формате. Это называется позиционным спецификатором и предназначено в первую очередь для использования в переводимых версиях строк формата, а не в оригинальном тексте программы AWK. Это расширение gawk.</td>
+</tr>
+<tr>
+<td><code>-</code></td>
+<td>Выражение должно быть выровнено по левому краю в своём поле.</td>
+</tr>
+<tr>
+<td><code>space</code></td>
+<td>Для числовых преобразований, префикс положительных значений пробелом, а отрицательных значений знаком минус.</td>
+</tr>
+<tr>
+<td><code>+</code></td>
+<td>Знак плюс, используемый перед модификатором ширины (см. ниже), говорит о том, что всегда следует указывать знак для числовых преобразований, даже если данные, которые нужно форматировать, положительны. Знак + отменяет модификатор space.</td>
+</tr>
+<tr>
+<td><code>#</code></td>
+<td>Используйте &quot;альтернативную форму&quot; для определённых управляющих букв. Для %o укажите ведущий ноль. Для %x и %X укажите ведущий 0x или 0X для ненулевого результата. Для %e, %E, %f и %F результат всегда содержит десятичную точку. Для %g и %G не удаляются конечные нули из результата.</td>
+</tr>
+<tr>
+<td><code>0</code></td>
+<td>Ведущий 0 (ноль) действует как флаг, указывающий, что вывод должен быть дополнен нулями вместо пробелов. Это применяется только к числовым форматам вывода. Этот флаг имеет эффект только тогда, когда ширина поля шире, чем значение, которое нужно напечатать.</td>
+</tr>
+<tr>
+<td><code>'</code></td>
+<td>Один символ апострофа указывает gawk вставить символ разделителя тысяч в десятичных числах и также использовать символ десятичной точки локали с форматами с плавающей запятой. Это требует правильной поддержки локали в библиотеке C и в определении текущей локали.</td>
+</tr>
+<tr>
+<td><code>width</code></td>
+<td>Поле должно быть дополнено до этой ширины. Поле обычно дополняется пробелами. С флагом 0 оно дополняется нулями.</td>
+</tr>
+<tr>
+<td><code>.prec</code></td>
+<td>Число, которое указывает точность, которую следует использовать при печати. Для форматов %e, %E, %f и %F это указывает количество цифр, которые вы хотите напечатать справа от десятичной точки. Для форматов %g и %G это указывает максимальное количество значащих цифр. Для форматов %d, %i, %o, %u, %x и %X это указывает минимальное количество цифр для печати. Для %s это указывает максимальное количество символов из строки, которые должны быть напечатаны.</td>
+</tr>
+</tbody>
+</table>
+<p>Поддерживаются динамические возможности ширины и точности стандартных процедур <code>printf()</code> ISO C. Звёздочка вместо спецификаций ширины или точности вызывает получение их значений из списка аргументов для <code>printf</code> или <code>sprintf()</code>. Чтобы использовать позиционный спецификатор с динамической шириной или точностью, укажите <code>count$</code> после <code>*</code> в строке формата. Например, <code>&quot;%3$*2$.*1$s&quot;</code>.</p>
+<h3 id="специальные-имена-файлов">Специальные имена файлов</h3>
+<p>При перенаправлении ввода-вывода из print или printf в файл или через getline из файла gawk распознаёт определённые специальные имена файлов. Эти имена файлов позволяют получить доступ к открытым файловым дескрипторам, унаследованным от родительского процесса gawk (обычно оболочки). Эти имена файлов также могут использоваться в командной строке для указания файлов данных. Эти имена файлов особенно полезны для сообщений об ошибках. Например:</p>
+<pre><code class="language-awk">print <span class="hljs-string">&quot;Вы ошиблись!&quot;</span> &gt; <span class="hljs-string">&quot;/dev/stderr&quot;</span>
+</code></pre>
+<p>в то время как вам в противном случае пришлось бы использовать</p>
+<pre><code class="language-awk">print <span class="hljs-string">&quot;Вы ошиблись!&quot;</span> | <span class="hljs-string">&quot;cat 1&gt;&amp;2&quot;</span>
+</code></pre>
+<p>Следующие специальные имена файлов могут использоваться с оператором <code>|&amp;</code> сопроцесса для создания TCP/IP сетевых соединений:</p>
+<ul>
+<li>Файлы для TCP/IP соединения на локальном порту lport к удалённому хосту rhost на удалённом порту rport. Используйте порт 0, чтобы позволить системе выбрать порт. Используйте /inet4, чтобы принудительно установить соединение IPv4, и /inet6, чтобы принудительно установить соединение IPv6. Обычное /inet использует системный стандарт (скорее всего, IPv4):
+<ul>
+<li><strong><code>/inet/tcp/lport/rhost/rport</code></strong></li>
+<li><strong><code>/inet4/tcp/lport/rhost/rport</code></strong></li>
+<li><strong><code>/inet6/tcp/lport/rhost/rport</code></strong></li>
+</ul>
+</li>
+<li>Аналогично, но использует UDP/IP вместо TCP/IP:
+<ul>
+<li><strong><code>/inet/udp/lport/rhost/rport</code></strong></li>
+<li><strong><code>/inet4/udp/lport/rhost/rport</code></strong></li>
+<li><strong><code>/inet6/udp/lport/rhost/rport</code></strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="числовые-функции">Числовые функции</h3>
+<p>AWK имеет следующие встроенные арифметические функции:</p>
+<table>
+<thead>
+<tr>
+<th>Функция</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>atan2(y, x)</code></td>
+<td>Возвращает арктангенс y/x в радианах.</td>
+</tr>
+<tr>
+<td><code>cos(expr)</code></td>
+<td>Возвращает косинус expr, который находится в радианах.</td>
+</tr>
+<tr>
+<td><code>exp(expr)</code></td>
+<td>Экспоненциальная функция.</td>
+</tr>
+<tr>
+<td><code>int(expr)</code></td>
+<td>Округляет до целого.</td>
+</tr>
+<tr>
+<td><code>log(expr)</code></td>
+<td>Натуральный логарифм.</td>
+</tr>
+<tr>
+<td><code>rand()</code></td>
+<td>Возвращает случайное число N, между нулём и единицей, так что 0 ≤ N &lt; 1.</td>
+</tr>
+<tr>
+<td><code>sin(expr)</code></td>
+<td>Возвращает синус expr, который находится в радианах.</td>
+</tr>
+<tr>
+<td><code>sqrt(expr)</code></td>
+<td>Возвращает квадратный корень из expr.</td>
+</tr>
+<tr>
+<td><code>srand([expr])</code></td>
+<td>Использует expr в качестве нового семени для генератора случайных чисел. Если expr не предоставлено, используется текущее время. Возвращает предыдущее семя для генератора случайных чисел.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="строковые-функции">Строковые функции</h3>
+<p>Gawk имеет следующие встроенные строковые функции:</p>
+<table>
+<thead>
+<tr>
+<th>Функция</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>asort(s [, d [, how] ])</code></td>
+<td>Возвращает количество элементов в исходном массиве <code>s</code>. Сортирует содержимое <code>s</code>, используя обычные правила gawk для сравнения значений, и заменяет индексы отсортированных значений <code>s</code> последовательными целыми числами, начиная с 1. Если указанный массив назначения <code>d</code>, сначала дублирует <code>s</code> в <code>d</code>, а затем сортирует <code>d</code>, оставляя индексы исходного массива <code>s</code> неизменными. Необязательная строка <code>how</code> контролирует направление и режим сравнения. Допустимые значения для <code>how</code> - это любые строки, действительные для <code>PROCINFO[&quot;sorted_in&quot;]</code>. Это также может быть имя пользовательской функции сравнения, как описано в <code>PROCINFO[&quot;sorted_in&quot;]</code>.</td>
+</tr>
+<tr>
+<td><code>asorti(s [, d [, how] ])</code></td>
+<td>Возвращает количество элементов в исходном массиве <code>s</code>. Поведение такое же, как у <code>asort()</code>, за исключением того, что индексы массива используются для сортировки, а не значения массива. Когда завершено, массив индексируется численно, а значения - это оригинальные индексы. Оригинальные значения теряются; поэтому предоставьте второй массив, если вы хотите сохранить оригинальное.</td>
+</tr>
+<tr>
+<td><code>gensub(r, s, h [, t])</code></td>
+<td>Ищет целевую строку <code>t</code> на совпадения регулярного выражения <code>r</code>. Если <code>h</code> - это строка, начинающаяся с <code>g</code> или <code>G</code>, то заменяет все совпадения <code>r</code> на <code>s</code>. В противном случае <code>h</code> - это число, указывающее, какое совпадение <code>r</code> заменить. Если <code>t</code> не указано, используется <code>$0</code> вместо этого. Внутри текста замены <code>s</code> последовательность <code>\n</code>, где <code>n</code> - это цифра от <code>1</code> до <code>9</code>, может использоваться для указания только текста, который совпал с <code>n</code>-ым родительским выражением. Последовательность <code>\0</code> представляет собой весь совпавший текст, как и символ <code>&amp;</code>. В отличие от <code>sub()</code> и <code>gsub()</code>, изменённая строка возвращается в качестве результата функции, а оригинальная целевая строка не изменяется.</td>
+</tr>
+<tr>
+<td><code>gsub(r, s [, t])</code></td>
+<td>Для каждой подстроки, соответствующей регулярному выражению r в строке t, заменяет строку s и возвращает количество замен. Если t не указано, используется $0. Символ &amp; в тексте замены заменяется текстом, который фактически совпал. Используйте &amp;, чтобы получить литерал &amp;. (Это должно быть напечатано как &quot;\&amp;&quot;; см. GAWK: Эффективное программирование на AWK для более полного обсуждения правил для амперсандов и обратных косых черт в тексте замены sub(), gsub() и gensub().)</td>
+</tr>
+<tr>
+<td><code>index(s, t)</code></td>
+<td>Возвращает индекс строки t в строке s, или ноль, если t отсутствует. (Это подразумевает, что индексы символов начинаются с единицы. ) Для t использовать регулярное выражение является фатальной ошибкой.</td>
+</tr>
+<tr>
+<td><code>length([s])</code></td>
+<td>Возвращает длину строки <code>s</code>, или длину <code>$0</code>, если <code>s</code> не указано. Как нестандартное расширение, с аргументом массива <code>length()</code> возвращает количество элементов в массиве.</td>
+</tr>
+<tr>
+<td><code>match(s, r [, a])</code></td>
+<td>Возвращает позицию в <code>s</code>, где регулярное выражение <code>r</code> встречается, или ноль, если <code>r</code> отсутствует, и устанавливает значения <code>RSTART</code> и <code>RLENGTH</code>. Обратите внимание, что порядок аргументов такой же, как для оператора <code>~</code>: <code>str ~ re</code>.<br>Если массив <code>a</code> предоставлен, <code>a</code> очищается, а затем элементы <code>1</code> до <code>n</code> заполняются частями <code>s</code>, которые соответствуют соответствующему родительскому выражению в <code>r</code>. Нулевой элемент <code>a</code> содержит часть <code>s</code>, совпавшую с полным регулярным выражением <code>r</code>. Индексы <code>a[n, &quot;start&quot;]</code> и <code>a[n, &quot;length&quot;]</code> предоставляют начальный индекс в строке и длину соответственно для каждой совпадающей подстроки.</td>
+</tr>
+<tr>
+<td><span style='white-space: nowrap;'><code>patsplit(s, a [, r [, seps] ])</code></span></td>
+<td>Разбивает строку s на массив a и массив разделителей seps по регулярному выражению r и возвращает количество полей. Элементы a содержат части s, которые совпадают с r. Значение seps[i] - это, возможно, пустой разделитель, который появился после a[i]. Значение seps[0] - это, возможно, пустой ведущий разделитель. Если r не указан, используется FPAT. Массивы a и seps очищаются сначала. Разбиение ведёт себя идентично разделению полей с FPAT, описанному выше.</td>
+</tr>
+<tr>
+<td><code>split(s, a [, r [, seps] ])</code></td>
+<td>Разбивает строку s на массив a и массив разделителей seps по регулярному выражению r и возвращает количество полей. Если r не указан, используется FS вместо этого. Массивы a и seps очищаются сначала. seps[i] - это разделитель поля, совпавший с r между a[i] и a[i+1]. Если r - это один пробел, то ведущие пробелы в s попадают в дополнительный элемент массива seps[0], а конечные пробелы попадают в дополнительный элемент массива seps[n], где n - это возвращаемое значение split(s, a, r, seps). Разбиение ведёт себя идентично разделению полей, описанному выше.</td>
+</tr>
+<tr>
+<td><code>sprintf(fmt, expr-list)</code></td>
+<td>Печатает expr-list в соответствии с fmt и возвращает результирующую строку.</td>
+</tr>
+<tr>
+<td><code>strtonum(str)</code></td>
+<td>Изучает str и возвращает его числовое значение. Если str начинается с ведущего 0, обрабатывает его как восьмеричное число. Если str начинается с ведущего 0x или 0X, обрабатывает его как шестнадцатеричное число. В противном случае предполагает, что это десятичное число.</td>
+</tr>
+<tr>
+<td><code>sub(r, s [, t])</code></td>
+<td>Точно так же, как gsub(), но заменяет только первое совпадение подстроки. Возвращает либо ноль, либо один.</td>
+</tr>
+<tr>
+<td><code>substr(s, i [, n])</code></td>
+<td>Возвращает подстроку длиной не более n символов из s, начиная с i. Если n не указано, используется остальная часть s.</td>
+</tr>
+<tr>
+<td><code>tolower(str)</code></td>
+<td>Возвращает копию строки str, в которой все заглавные буквы в str преобразованы в соответствующие строчные буквы. Непечатные символы остаются неизменными.</td>
+</tr>
+<tr>
+<td><code>toupper(str)</code></td>
+<td>Возвращает копию строки str, в которой все строчные буквы в str преобразованы в соответствующие заглавные буквы. Непечатные символы остаются неизменными.</td>
+</tr>
+</tbody>
+</table>
+<p>Gawk осведомлён о многобайтовых символах. Это означает, что index(), length(), substr() и match() работают с точки зрения символов, а не байтов.</p>
+<h3 id="функции-времени">Функции времени</h3>
+<p>Поскольку одной из основных целей программ AWK является обработка файлов журналов, содержащих информацию о временных метках, gawk предоставляет следующие функции для получения временных меток и их форматирования.</p>
+<h4 id="mktimedatespec--utc-flag"><code>mktime(datespec [, utc-flag])</code></h4>
+<p>Превращает <code>datespec</code> в временную метку того же формата, что и возвращаемая <code>systime()</code>, и возвращает результат. datespec - это строка формата YYYY MM DD HH MM SS[ DST]. Содержимое строки состоит из шести или семи чисел, представляющих соответственно полный год, включая век, месяц от 1 до 12, день месяца от 1 до 31, час дня от 0 до 23, минуту от 0 до 59, секунду от 0 до 60 и необязательный флаг перехода на летнее время. Значения этих чисел не обязательно должны находиться в указанных диапазонах; например, час -1 означает 1 час до полуночи. Предполагается, что используется григорианский календарь с нулевым началом, где год 0 предшествует году 1, а год -1 предшествует году 0. Если utc-flag присутствует и не равен нулю или пустой строке, время предполагается в часовом поясе UTC; в противном случае время предполагается в местном часовом поясе. Если флаг перехода на летнее время положителен, время предполагается в летнем времени; если ноль, время предполагается в стандартном времени; если отрицательный (по умолчанию), mktime() пытается определить, находится ли переход на летнее время в действии для указанного времени. Если datespec не содержит достаточного количества элементов или если полученное время выходит за пределы диапазона, mktime() возвращает -1.</p>
+<h4 id="strftimeformat--timestamp-utc-flag"><code>strftime([format [, timestamp[, utc-flag]]])</code></h4>
+<p>Форматирует timestamp в соответствии со спецификацией в format. Если utc-flag присутствует и не равен нулю или пустой строке, результат будет в UTC, в противном случае результат будет в местном времени. timestamp должен быть того же формата, что и возвращаемое systime(). Если timestamp отсутствует, используется текущее время суток. Если format отсутствует, используется формат по умолчанию, эквивалентный выводу date(1). Формат по умолчанию доступен в PROCINFO[&quot;strftime&quot;]. См. спецификацию для функции strftime() в ISO C для гарантированных преобразований формата.</p>
+<h4 id="systime"><code>systime()</code></h4>
+<p>Возвращает текущее время суток в виде количества секунд с начала эпохи (1970-01-01 00:00:00 UTC на POSIX системах).</p>
+<h3 id="функции-манипуляции-битами">Функции манипуляции битами</h3>
+<p>Gawk предоставляет следующие функции манипуляции битами. Они работают, преобразуя значения с плавающей запятой двойной точности в целые числа uintmax_t, выполняя операцию, а затем преобразуя результат обратно в число с плавающей запятой.</p>
+<p><strong>ПРИМЕЧАНИЕ:</strong> Передача отрицательных операндов в любую из этих функций вызывает фатальную ошибку.</p>
+<p>Функции:</p>
+<table>
+<thead>
+<tr>
+<th>Функция</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>and(v1, v2 [, ...])</code></td>
+<td>Возвращает побитовый И значений, предоставленных в списке аргументов. Должно быть как минимум два.</td>
+</tr>
+<tr>
+<td><code>compl(val)</code></td>
+<td>Возвращает побитовую инверсию val.</td>
+</tr>
+<tr>
+<td><code>lshift(val, count)</code></td>
+<td>Возвращает значение val, сдвинутое влево на count бит.</td>
+</tr>
+<tr>
+<td><code>or(v1, v2 [, ...])</code></td>
+<td>Возвращает побитовый ИЛИ значений, предоставленных в списке аргументов. Должно быть как минимум два.</td>
+</tr>
+<tr>
+<td><code>rshift(val, count)</code></td>
+<td>Возвращает значение val, сдвинутое вправо на count бит.</td>
+</tr>
+<tr>
+<td><code>xor(v1, v2 [, ...])</code></td>
+<td>Возвращает побитовый исключающий ИЛИ значений, предоставленных в списке аргументов. Должно быть как минимум два.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="функции-типов">Функции типов</h3>
+<table>
+<thead>
+<tr>
+<th>Функция</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>isarray(x)</code></td>
+<td>Возвращает <code>true</code>, если <code>x</code> является массивом, <code>false</code> в противном случае.</td>
+</tr>
+<tr>
+<td><code>typeof(x)</code></td>
+<td>Возвращает строку, указывающую тип x. Строка будет одной из <code>&quot;array&quot;</code>, <code>&quot;number&quot;</code>, <code>&quot;regexp&quot;</code>, <code>&quot;string&quot;</code>, <code>&quot;strnum&quot;</code> или <code>&quot;undefined&quot;</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="функции-интернационализации">Функции интернационализации</h3>
+<p>Следующие функции могут использоваться изнутри вашей программы AWK для перевода строк во время выполнения. Для получения полных деталей см. GAWK: Эффективное программирование на AWK.</p>
+<p><strong><code>bindtextdomain(directory [, domain])</code></strong>
+Указывает каталог, в котором gawk ищет файлы .gmo, в случае, если их нельзя разместить в &quot;стандартных&quot; местах (например, во время тестирования). Он возвращает каталог, в котором домен &quot;связан&quot;.
+Стандартный домен - это значение переменной TEXTDOMAIN. Если каталог - пустая строка (&quot;&quot;), то bindtextdomain() возвращает текущее связывание для данного домена.</p>
+<p><strong><code>dcgettext(string [, domain [, category]])</code></strong>
+Возвращает перевод строки в текстовом домене domain для категории локали category. Стандартное значение для domain - это текущее значение TEXTDOMAIN. Стандартное значение для category - &quot;LC_MESSAGES&quot;.
+Если вы предоставите значение для category, оно должно быть строкой, равной одной из известных категорий локали, описанных в GAWK: Эффективное программирование на AWK. Вы также должны предоставить текстовый домен. Используйте TEXTDOMAIN, если хотите использовать текущий домен.</p>
+<p><strong><code>dcngettext(string1, string2, number [, domain [, category]])</code></strong>
+Возвращает множественную форму, используемую для числа перевода string1 и string2 в текстовом домене domain для категории локали category. Стандартное значение для domain - текущее значение TEXTDOMAIN. Стандартное значение для category - &quot;LC_MESSAGES&quot;.
+Если вы предоставите значение для category, оно должно быть строкой, равной одной из известных категорий локали, описанных в GAWK: Эффективное программирование на AWK. Вы также должны предоставить текстовый домен. Используйте TEXTDOMAIN, если хотите использовать текущий домен.</p>
+<h3 id="пользовательские-функции">ПОЛЬЗОВАТЕЛЬСКИЕ ФУНКЦИИ</h3>
+<p>Функции в AWK определяются следующим образом:</p>
+<pre><code class="language-awk"><span class="hljs-keyword">function</span> имя(список параметров) { 
+       операторы 
+}
+</code></pre>
+<p>Функции выполняются, когда они вызываются из выражений в шаблонах или действиях. Фактические параметры, переданные в вызове функции, используются для инициализации формальных
+параметров, объявленных в функции. Массивы передаются по ссылке, другие переменные передаются по значению.</p>
+<p>Поскольку функции изначально не были частью языка AWK, возможность использования локальных переменных довольно неудобна: они объявляются как дополнительные параметры в списке параметров.
+Принято отделять локальные переменные от реальных параметров дополнительными пробелами в списке параметров. Например:</p>
+<pre><code class="language-awk"><span class="hljs-keyword">function</span>  f(p, q,     a, b)   <span class="hljs-comment"># a и b - локальные</span>
+{
+       ...
+}
+
+<span class="hljs-regexp">/abc/</span>     { ... ; f(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>) ; ... }
+</code></pre>
+<p>Левая скобка в вызове функции должна немедленно следовать за именем функции, без промежуточных пробелов. Это избегает синтаксической неоднозначности с оператором конкатенации.
+Это ограничение не применяется к встроенным функциям, перечисленным выше.</p>
+<p>Функции могут вызывать друг друга и могут быть рекурсивными. Параметры функции, используемые как локальные переменные, инициализируются пустой строкой и числом ноль при вызове функции.</p>
+<p>Используйте return expr, чтобы вернуть значение из функции. Возвращаемое значение неопределено, если значение не предоставлено или если функция возвращается, &quot;упав&quot; с конца.</p>
+<p>Как расширение gawk, функции могут вызываться косвенно. Для этого присвойте имя функции, которую нужно вызвать, в виде строки переменной. Затем используйте переменную так, как если бы это
+было имя функции, с префиксом @, например:</p>
+<pre><code class="language-awk"><span class="hljs-keyword">function</span> myfunc()
+{
+       print <span class="hljs-string">&quot;myfunc вызвана&quot;</span>
+       ...
+}
+
+{    ...
+       the_func = <span class="hljs-string">&quot;myfunc&quot;</span>
+       @the_func()    <span class="hljs-comment"># вызов через the_func к myfunc</span>
+       ...
+}
+</code></pre>
+<p>Начиная с версии 4.1.2, это работает с пользовательскими функциями, встроенными функциями и функциями расширения.</p>
+<p>Если был предоставлен --lint, gawk предупреждает о вызовах неопределенных функций на этапе разбора, а не во время выполнения. Вызов неопределенной функции во время выполнения является фатальной ошибкой.</p>
+<p>Слово func может использоваться вместо function, хотя это устарело.</p>
+<h2 id="динамическая-загрузка-новых-функций">ДИНАМИЧЕСКАЯ ЗАГРУЗКА НОВЫХ ФУНКЦИЙ</h2>
+<p>Вы можете динамически добавлять новые встроенные функции в работающий интерпретатор gawk с помощью оператора @load. Полные детали выходят за рамки этой страницы руководства; смотрите GAWK:
+Эффективное программирование на AWK.</p>
+<h2 id="сигналы">СИГНАЛЫ</h2>
+<p>Профайлер gawk принимает два сигнала. SIGUSR1 заставляет его сбросить профиль и стек вызовов функций в файл профиля, который либо awkprof.out, либо любой файл, указанный с помощью параметра --profile. Затем он продолжает работу. SIGHUP заставляет gawk сбросить профиль и стек вызовов функций, а затем выйти.</p>
+<h2 id="международная-адаптация">МЕЖДУНАРОДНАЯ АДАПТАЦИЯ</h2>
+<p>Строковые константы — это последовательности символов, заключенные в двойные кавычки. В неанглоязычных средах возможно пометить строки в программе AWK как требующие перевода на местный язык. Такие строки помечаются в программе AWK ведущим подчеркиванием (“_”). Например,</p>
+<pre><code class="language-bash">gawk <span class="hljs-string">&#x27;BEGIN { print &quot;hello, world&quot; }&#x27;</span>
+</code></pre>
+<p>всегда выводит hello, world. Но,</p>
+<pre><code class="language-bash">gawk <span class="hljs-string">&#x27;BEGIN { print _&quot;hello, world&quot; }&#x27;</span>
+</code></pre>
+<p>может вывести bonjour, monde во Франции.</p>
+<p>Существует несколько шагов, необходимых для создания и запуска локализуемой программы AWK.</p>
+<ol>
+<li>Добавьте действие BEGIN, чтобы присвоить значение переменной TEXTDOMAIN, чтобы установить текстовый домен на имя, связанное с вашей программой:</li>
+</ol>
+<pre><code class="language-awk"><span class="hljs-keyword">BEGIN</span> { TEXTDOMAIN = <span class="hljs-string">&quot;myprog&quot;</span> }
+</code></pre>
+<p>Это позволяет gawk найти файл .gmo, связанный с вашей программой. Без этого шага gawk использует текстовый домен сообщений, который, вероятно, не содержит переводов для вашей программы.</p>
+<ol start="2">
+<li>
+<p>Пометьте все строки, которые должны быть переведены, ведущими подчеркиваниями.</p>
+</li>
+<li>
+<p>При необходимости используйте функции dcgettext() и/или bindtextdomain() в вашей программе, если это необходимо.</p>
+</li>
+<li>
+<p>Запустите <code>gawk --gen-pot -f myprog.awk &gt; myprog.pot</code>, чтобы сгенерировать файл <code>.pot</code> для вашей программы.</p>
+</li>
+<li>
+<p>Предоставьте соответствующие переводы и создайте и установите соответствующие файлы <code>.gmo</code>.</p>
+</li>
+</ol>
+<p>Функции интернационализации описаны в полном объеме в GAWK: Эффективное программирование на AWK.</p>
+<h2 id="совместимость-с-posix">СОВМЕСТИМОСТЬ С POSIX</h2>
+<p>Основная цель gawk — совместимость со стандартом POSIX, а также с последней версией awk Брайана Кернигана. Для этого gawk включает следующие видимые пользователю функции, которые не описаны в книге AWK, но являются частью версии awk Брайана Кернигана и входят в стандарт POSIX.</p>
+<p>В книге указано, что присвоение переменных командной строки происходит, когда awk в противном случае открыл бы аргумент как файл, что происходит после выполнения правила BEGIN. Однако в более ранних реализациях, когда такое присвоение появлялось перед любыми именами файлов, присвоение происходило до выполнения правила BEGIN. Приложения стали зависеть от этой “функции”. Когда awk был изменен, чтобы соответствовать своей документации, была добавлена опция -v для присвоения переменных до выполнения программы, чтобы учесть приложения, которые зависели от старого поведения. (Эта функция была согласована как Bell Laboratories, так и разработчиками GNU.)</p>
+<p>При обработке аргументов gawk использует специальный параметр “--”, чтобы сигнализировать о конце аргументов. В режиме совместимости он предупреждает о неопределенных параметрах, но в остальном игнорирует их. В нормальном режиме такие аргументы передаются в программу AWK для обработки.</p>
+<p>Книга AWK не определяет возвращаемое значение srand(). Стандарт POSIX требует, чтобы он возвращал используемое семя, чтобы отслеживать последовательности случайных чисел. Поэтому srand() в gawk также возвращает текущее семя.</p>
+<h2 id="исторические-особенности">ИСТОРИЧЕСКИЕ ОСОБЕННОСТИ</h2>
+<p>Существует одна особенность исторических реализаций AWK, которую поддерживает gawk: возможно вызывать встроенную функцию length() не только без аргумента, но даже без скобок! Таким образом,</p>
+<pre><code class="language-awk">a = length     <span class="hljs-comment"># Holy Algol 60, Batman!</span>
+</code></pre>
+<p>эквивалентно любому из</p>
+<pre><code class="language-awk">a = length()
+a = length(<span class="hljs-variable">$0</span>)
+</code></pre>
+<p>Использование этой функции является плохой практикой, и gawk выдает предупреждение о ее использовании, если на командной строке указана опция <code>--lint</code>.</p>
+<h2 id="расширения-gnu">РАСШИРЕНИЯ GNU</h2>
+<p>Gawk имеет слишком много расширений к POSIX awk. Они описаны в этом разделе. Все описанные здесь расширения могут быть отключены, если вызвать gawk с параметрами --traditional или --posix.</p>
+<p>Следующие функции gawk недоступны в POSIX awk.</p>
+<ul>
+<li>Поиск пути не выполняется для файлов, указанных с помощью параметра -f. Поэтому переменная окружения AWKPATH не является специальной.</li>
+<li>Нет возможности включения файлов (механизм @include gawk).</li>
+<li>Нет возможности динамически добавлять новые функции, написанные на C (механизм @load gawk).</li>
+<li>Эскейп-последовательность \x.</li>
+<li>Возможность продолжать строки после ? и :.</li>
+<li>Восьмеричные и шестнадцатеричные константы в программах AWK.</li>
+<li>Переменные ARGIND, BINMODE, ERRNO, LINT, PREC, ROUNDMODE, RT и TEXTDOMAIN не являются специальными.</li>
+<li>Переменная IGNORECASE и ее побочные эффекты недоступны.</li>
+<li>Переменная FIELDWIDTHS и разбиение полей фиксированной ширины.</li>
+<li>Переменная FPAT и разбиение полей на основе значений полей.</li>
+<li>Массивы FUNCTAB, SYMTAB и PROCINFO недоступны.</li>
+<li>Использование RS как регулярного выражения.</li>
+<li>Специальные имена файлов, доступные для перенаправления ввода-вывода, не распознаются.</li>
+<li>Оператор |&amp; для создания сопроцессов.</li>
+<li>Специальные шаблоны BEGINFILE и ENDFILE недоступны.</li>
+<li>Возможность выделять отдельные символы, используя пустую строку в качестве значения FS и в качестве третьего аргумента для split().</li>
+<li>Необязательный четвертый аргумент для split(), чтобы получить тексты разделителей.
+· Необязательный второй аргумент для функции close().</li>
+<li>Необязательный третий аргумент для функции match().</li>
+<li>Возможность использовать позиционные спецификаторы с printf и sprintf().</li>
+<li>Возможность передавать массив в length().</li>
+<li>Функции and(), asort(), asorti(), bindtextdomain(), compl(), dcgettext(), dcngettext(), gensub(), lshift(), mktime(), or(), patsplit(), rshift(), strftime(), strtonum(), systime() и xor().</li>
+<li>Локализуемые строки.</li>
+<li>Нефатальный ввод-вывод.</li>
+<li>Повторяемый ввод-вывод.</li>
+</ul>
+<p>Книга AWK не определяет возвращаемое значение функции close(). Функция close() gawk возвращает значение из fclose(3) или pclose(3) при закрытии выходного файла или канала соответственно. Она возвращает статус выхода процесса при закрытии входного канала. Возвращаемое значение равно -1, если указанный файл, канал или сопроцесс не был открыт с перенаправлением.</p>
+<p>Когда gawk вызывается с параметром --traditional, если аргумент fs для параметра -F равен “t”, то FS устанавливается в символ табуляции. Обратите внимание, что ввод gawk -F\t ... просто заставляет оболочку экранировать “t” и не передает “\t” в параметр -F. Поскольку это довольно неприятный специальный случай, он не является поведением по умолчанию. Это поведение также не происходит, если указана опция --posix. Чтобы действительно получить символ табуляции в качестве разделителя полей, лучше использовать одинарные кавычки: gawk -F'\t' ....</p>
+<h2 id="переменные-окружения">ПЕРЕМЕННЫЕ ОКРУЖЕНИЯ</h2>
+<p>Переменная окружения AWKPATH может использоваться для предоставления списка директорий, которые gawk ищет при поиске файлов, указанных с помощью параметров -f, --file, -i и --include, а также директивы @include. Если первоначальный поиск не удался, путь снова ищется после добавления .awk к имени файла.</p>
+<p>Переменная окружения AWKLIBPATH может использоваться для предоставления списка директорий, которые gawk ищет при поиске файлов, указанных с помощью параметров -l и --load.</p>
+<p>Переменная окружения GAWK_READ_TIMEOUT может использоваться для указания таймаута в миллисекундах для чтения ввода из терминала, канала или двусторонней связи, включая сокеты.</p>
+<p>Для подключения к удаленному хосту через сокет, GAWK_SOCK_RETRIES контролирует количество попыток, а GAWK_MSEC_SLEEP — интервал между попытками. Интервал указывается в миллисекундах. На системах, которые не поддерживают usleep(3), значение округляется до целого числа секунд.</p>
+<p>Если в окружении существует переменная POSIXLY_CORRECT, то gawk ведет себя точно так же, как если бы на командной строке была указана опция --posix. Если указана опция --lint, gawk выдает предупреждение об этом.</p>
+<h2 id="статус-выхода-exit-code">СТАТУС ВЫХОДА (Exit Code)</h2>
+<p>Если оператор exit используется с значением, то gawk завершает работу с числовым значением, указанным в нем.</p>
+<p>В противном случае, если во время выполнения не возникло проблем, gawk завершает работу со значением константы C EXIT_SUCCESS. Обычно это ноль.</p>
+<p>Если произошла ошибка, gawk завершает работу со значением константы C EXIT_FAILURE. Обычно это один.</p>
+<p>Если gawk завершает работу из-за фатальной ошибки, статус выхода равен 2. На системах, не соответствующих POSIX, это значение может быть сопоставлено с EXIT_FAILURE.</p>
+<h2 id="отчеты-об-ошибках">ОТЧЕТЫ ОБ ОШИБКАХ</h2>
+<p>Если вы обнаружите ошибку в gawk, пожалуйста, отправьте электронное письмо на адрес <a href="mailto:bug-gawk@gnu.org">bug-gawk@gnu.org</a>. Пожалуйста, укажите вашу операционную систему и ее версию, версию gawk (из gawk --version), какой компилятор C вы использовали для ее компиляции, а также тестовую программу и данные, которые как можно меньше, чтобы воспроизвести проблему.</p>
+<p>Перед отправкой отчета об ошибке, пожалуйста, выполните следующие действия. Во-первых, убедитесь, что у вас последняя версия gawk. Многие ошибки (обычно тонкие) исправляются с каждым релизом, и если ваша версия устарела, проблема может уже быть решена. Во-вторых, проверьте, вызывает ли установка переменной окружения LC_ALL в LC_ALL=C ожидаемое поведение. Если да, это проблема локали, и может быть, что это не ошибка. Наконец, внимательно прочитайте эту страницу руководства и справочное руководство, чтобы убедиться, что то, что вы считаете ошибкой, действительно является ошибкой, а не просто особенностью языка.</p>
+<p>Что бы вы ни делали, НИКОГДА не публикуйте отчет об ошибке в comp.lang.awk. Хотя разработчики gawk иногда читают эту новую группу, публикация отчетов об ошибках там является ненадежным способом их сообщения. Вместо этого, пожалуйста, используйте указанные выше адреса электронной почты. Действительно.</p>
+<p>Если вы используете систему на базе GNU/Linux или BSD, вы можете отправить отчет об ошибке поставщику вашего дистрибутива. Это нормально, но, пожалуйста, отправьте копию и на официальный адрес электронной почты, так как нет гарантии, что отчет об ошибке будет передан куратору gawk.</p>
+<h2 id="ошибки">ОШИБКИ</h2>
+<p>Опция -F не требуется, учитывая функцию присвоения переменных командной строки; она остается только для обратной совместимости.</p>
+<h2 id="смотрите-также">СМОТРИТЕ ТАКЖЕ</h2>
+<p>egrep(1), sed(1), getpid(2), getppid(2), getpgrp(2), getuid(2), geteuid(2), getgid(2), getegid(2), getgroups(2), printf(3), strftime(3), usleep(3)</p>
+<p>Язык программирования AWK, Альфред В. Ах, Брайан В. Керниган, Питер Дж. Вайнбергер, Addison-Wesley, 1988. ISBN 0-201-07981-X.</p>
+<p>GAWK: Эффективное программирование на AWK, Издание 4.2, поставляется с исходным кодом gawk. Текущая версия этого документа доступна онлайн по адресу <a href="https://www.gnu.org/software/gawk/manual">https://www.gnu.org/software/gawk/manual</a>.</p>
+<p>Документация GNU gettext, доступная онлайн по адресу <a href="https://www.gnu.org/software/gettext">https://www.gnu.org/software/gettext</a>.</p>
+<h2 id="примеры">ПРИМЕРЫ</h2>
+<p>Вывод и сортировка имен пользователей:</p>
+<pre><code class="language-awk"><span class="hljs-keyword">BEGIN</span>     { FS = <span class="hljs-string">&quot;:&quot;</span> }
+{ print <span class="hljs-variable">$1</span> | <span class="hljs-string">&quot;sort&quot;</span> }
+</code></pre>
+<p>Подсчет строк в файле:</p>
+<pre><code class="language-awk">{ nlines++ }
+<span class="hljs-keyword">END</span>  { print nlines }
+</code></pre>
+<p>Предшествование каждой строки ее номером в файле:</p>
+<pre><code class="language-awk">{ print FNR, <span class="hljs-variable">$0</span> }
+</code></pre>
+<p>Конкатенация и номер строки (вариация на тему):</p>
+<pre><code class="language-awk">{ print NR, <span class="hljs-variable">$0</span> }
+</code></pre>
+<p>Запуск внешней команды для определенных строк данных:</p>
+<pre><code class="language-bash"><span class="hljs-built_in">tail</span> -f access_log |
+awk <span class="hljs-string">&#x27;/myhome.html/ { system(&quot;nmap &quot; $1 &quot;&gt;&gt; logdir/myhome.html&quot;) }&#x27;</span>
+</code></pre>
+
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+            
+        </body>
+        </html>
